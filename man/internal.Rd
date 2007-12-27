@@ -66,10 +66,10 @@
 \alias{ellK}
 \alias{getcc}
 \alias{ecc2edges}
-\alias{coef.RCOX}
-\alias{vcov.RCOX}
-\alias{summary.RCOX}
-\alias{print.summary.RCOX}
+\alias{coef.rcox}
+\alias{vcov.rcox}
+\alias{summary.rcox}
+\alias{print.summary.rcox}
 \alias{logL}
 \alias{tocc}
 \alias{cc2str}
@@ -115,7 +115,7 @@
 %%% Repair K
 %%% Code: repairK.R
 \alias{findKinModel}
-\alias{findKinModel.RCOX}
+\alias{findKinModel.rcox}
 %\alias{}
 %\alias{}
 
@@ -170,8 +170,8 @@
 %%% Printing, plotting etc.
 %%% code: All over the place
 \alias{print.colourClass}
-\alias{print.RCOX}
-\alias{plot.RCOX}
+\alias{print.rcox}
+\alias{plot.rcox}
 \alias{print.statTable}
 %\alias{}
 

@@ -63,8 +63,8 @@ stepsplit1(object, type = "ecc", criterion = "aic", steps = 1000, k = 2, alpha =
 \seealso{
   \code{\link{split1}}
   \code{\link{join1}}
-  \code{\link{add1.RCOX}}
-  \code{\link{drop1.RCOX}}
+  \code{\link{add1.rcox}}
+  \code{\link{drop1.rcox}}
   \code{\link{comparecc}}
 }
 %\examples{

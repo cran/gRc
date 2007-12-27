@@ -1,6 +1,6 @@
 \name{fit}
 \alias{fit}
-\alias{fit.RCOX}
+\alias{fit.rcox}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Fit RCOX models}
 \description{
@@ -13,7 +13,7 @@ details = object$details, trace = object$trace, returnModel = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{object}{An RCOX model object (an object of class RCOX)}
+  \item{object}{An RCOX model object (an object of class 'rcox')}
   \item{method}{The specific estimation method. Can be either "scoring",
     (a modified Fisher scoring algorithm),
     "ipm" (iterative partial maximization), "matching" (score matching)
@@ -45,7 +45,7 @@ details = object$details, trace = object$trace, returnModel = TRUE)
 %}
 \seealso{
   \code{\link{rcox}},
-  \code{\link{update.RCOX}}
+  \code{\link{update.rcox}}
 }
 \examples{
 

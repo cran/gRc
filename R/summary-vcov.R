@@ -1,5 +1,5 @@
 
-summary.RCOX <- function(object, type="coef",...){
+summary.rcox <- function(object, type="coef",...){
   type  <- match.arg(type,c("coef","K","KC","ACA"))
   m     <- object
   vn <- unlist(lapply(getcc(object),names))
@@ -52,12 +52,12 @@ summary.RCOX <- function(object, type="coef",...){
          }
          
          )
-  class(ans) <- "summary.RCOX"
+  class(ans) <- "summary.rcox"
   ans
 }
 
 
-print.summary.RCOX <- function(x, ...){
+print.summary.rcox <- function(x, ...){
 #   cat("vcc: ", cc2str(x$vcc),"\n")
 #   cat("ecc: ", cc2str(x$ecc),"\n")
 
@@ -88,7 +88,7 @@ print.summary.RCOX <- function(x, ...){
 }
 
 
-# vcov.RCOX <- function(object, ...){
+# vcov.rcox <- function(object, ...){
 #   f1     <- fitInfo(object)
 #   method <- f1$method
 #   switch(method,
@@ -110,7 +110,7 @@ print.summary.RCOX <- function(x, ...){
 # }
 
 
-vcov.RCOX <- function(object, ...){
+vcov.rcox <- function(object, ...){
   f1     <- fitInfo(object)
   solve(f1$J)
 }

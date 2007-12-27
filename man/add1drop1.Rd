@@ -1,6 +1,6 @@
 \name{add1drop1}
-\alias{add1.RCOX}
-\alias{drop1.RCOX}
+\alias{add1.rcox}
+\alias{drop1.rcox}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 
@@ -10,12 +10,12 @@
   RCOX model.
 }
 \usage{
-\method{add1}{RCOX}(object, scope, details = 1, trace = 0, ...)
-\method{drop1}{RCOX}(object, scope, details = 1, trace = 0, stat = "wald", ...) 
+\method{add1}{rcox}(object, scope, details = 1, trace = 0, ...)
+\method{drop1}{rcox}(object, scope, details = 1, trace = 0, stat = "wald", ...) 
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{object}{An RCOX model, an object of class RCOX}
+  \item{object}{An RCOX model, an object of class 'rcox'}
   \item{scope}{A set of edge colour classes to be considered for
     addition or deletion, see 'details'.}
   \item{details}{Control the amount of output created.}

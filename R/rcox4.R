@@ -56,7 +56,7 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
                         trace   = trace,
                         control = con
                         ),
-                   class=c(type, "RCOX"))
+                   class=c(type, "rcox"))
 
   if (fit){
     ans$fitInfo <- .fitit(ans, method=method, trace=trace)
@@ -65,11 +65,11 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
 
 }
 
-print.RCOX <- function(x, ...){
+print.rcox <- function(x, ...){
   cat(toupper(getSlot(x,"type")), "model: ")
   if (!is.null(x$fitInfo)){
-    cat("logL=", x$fitInfo$logL, "dimension=", dimension(x))
-    cat(" method=", x$method, "time=", fitInfo(x,"time"))
+    cat("logL=", x$fitInfo$logL, " dimension=", dimension(x),
+        " method=", x$method, " time=", fitInfo(x,"time"),sep='')
   }
   cat("\n")
 

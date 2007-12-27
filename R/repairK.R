@@ -9,7 +9,7 @@ findKinModel <- function(m, KS, type="rcon", regularize=TRUE)
 
 
 ## MATRIX VERSION
-findKinModel.RCOX <- function(m, KS, type="rcon", regularize=TRUE){
+findKinModel.rcox <- function(m, KS, type="rcon", regularize=TRUE){
   if (is.null(KS))
     return(NULL)
   
@@ -103,7 +103,7 @@ regularizeK <- function(K){
 
 
 
-# findKinModel.RCOX <- function(m, KS, type="rcon", regularize=TRUE){
+# findKinModel.rcox <- function(m, KS, type="rcon", regularize=TRUE){
 #   if (is.null(KS))
 #     return(NULL)
   

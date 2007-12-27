@@ -47,10 +47,9 @@ details=1, trace=0)
 }
 %\references{ ~put references to the literature/web site here ~ }
 \author{Søren Højsgaard, sorenh@agrsci.dk}
-%\note{ ~~further notes~~ 
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-%}
+\note{
+  demo("gRc-JSS") gives a more comprehensive demo. 
+}
 %\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
 

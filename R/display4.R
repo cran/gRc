@@ -1,4 +1,4 @@
-plot.RCOX <- function(x,y,...){
+plot.rcox <- function(x,y,...){
 
   m2 <- x
 #  eccList <- getCC2(m2,'ecc','list')

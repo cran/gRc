@@ -9,20 +9,39 @@ stepadd1 <- function(object, criterion="aic", steps=1000, k=2, alpha=0.05, detai
     alpha <- 0
   }
   if (details>=1){
-  cat("Stepwise addition of atomic edge colour classes; ")  
-  switch(criterion,
-    "aic"={if (k==2) 
-            cat("criterion: aic", "alpha:", alpha, "\n")  
-           else
-            cat("criterion: aic", "k:", k, "alpha:", alpha, "\n")  
-          },
-    "bic"={
-            cat("criterion: bic", "alpha:", alpha, "\n")      
-          }, 
-    "test"={
-        cat("criterion: test", "alpha:", alpha, "\n")      
-     })
+
+    cat("Stepwise addition of atomic edge colour classes; ")  
+#     switch(criterion,
+#            "aic"={if (k==2) 
+#                     cat("criterion: aic", "alpha:", alpha, "\n")  
+#            else
+#              cat("criterion: aic", "k:", k, "alpha:", alpha, "\n")  
+#                 },
+#            "bic"={
+#              cat("criterion: bic", "alpha:", alpha, "\n")      
+#            }, 
+#            "test"={
+#              cat("criterion: test", "alpha:", alpha, "\n")      
+#            })
+
+    switch(criterion,
+           "aic"={
+             if (k==2) 
+               cat(paste("criterion=aic",  sep=''), "\n")  
+             else
+               cat(paste("criterion=aic", "k=", k, sep=''), "\n")  
+           },
+           "bic"={
+             cat(paste("criterion=bic", sep=''), "\n")      
+           }, 
+           "test"={
+             cat(paste("criterion=test", " alpha=", alpha,sep=''), "\n")      
+           })
+
   }
+
+
+  
   modelChange <- FALSE
   stepcount <- 1
   repeat{
@@ -81,20 +100,42 @@ stepdrop1 <- function(object, criterion='aic', steps=1000, k=2,   alpha=0.05, st
     alpha <- 0
   }
   if (details>=1){
-    cat("Stepwise dropping of edge colour classes; ")  
+
+    
+    #typeStr <- ifelse (type=="vcc", "vertex colour classes", "edge colour classes")
+    cat("Stepwise dropping of edge colour classes\n")
     switch(criterion,
-           "aic"={if (k==2) 
-                    cat("criterion: aic", "alpha:", alpha, "\n\n")  
-           else
-             cat("criterion: aic", "k:", k, "alpha:", alpha, "\n\n")  
-                },
+           "aic"={
+             if (k==2) 
+               cat(paste("statistic=",stat," criterion=aic",  sep=''), "\n")  
+             else
+               cat(paste("statistic=",stat," criterion=aic", "k=", k, sep=''), "\n")  
+           },
            "bic"={
-             cat("criterion: bic", "alpha:", alpha, "\n\n")      
+             cat(paste("statistic=",stat," criterion=bic", sep=''), "\n")      
            }, 
            "test"={
-             cat("criterion: test", "alpha:", alpha, "\n\n")      
+             cat(paste("statistic=",stat," criterion=test", " alpha=", alpha,sep=''), "\n")      
            })
+
+    
+#     cat("Stepwise dropping of edge colour classes; ")  
+#     switch(criterion,
+#            "aic"={if (k==2) 
+#                     cat("criterion: aic", "alpha:", alpha, "\n\n")  
+#            else
+#              cat("criterion: aic", "k:", k, "alpha:", alpha, "\n\n")  
+#                 },
+#            "bic"={
+#              cat("criterion: bic", "alpha:", alpha, "\n\n")      
+#            }, 
+#            "test"={
+#              cat("criterion: test", "alpha:", alpha, "\n\n")      
+#            })
   }
+
+
+  
   changelist <- NULL
   modelChange <- FALSE
   stepcount <- 1
@@ -163,22 +204,29 @@ stepjoin1 <- function(object, type='ecc', criterion='aic', steps=1000, k=2,
   }
   
   if (details>=1){
-    cat("Stepwise joining of colour classes of type:", type, "using statistic:", stat, ";")  
+
+    
+    typeStr <- ifelse (type=="vcc", "vertex colour classes", "edge colour classes")
+    cat("Stepwise joining of", typeStr, "\n")
     switch(criterion,
            "aic"={
              if (k==2) 
-               cat("criterion: aic", "alpha:", alpha, "\n")  
+               cat(paste("statistic=",stat," criterion=aic",  sep=''), "\n")  
              else
-               cat("criterion: aic", "k:", k, "alpha:", alpha, "\n")  
+               cat(paste("statistic=",stat," criterion=aic", "k=", k, sep=''), "\n")  
            },
            "bic"={
-             cat("criterion: bic", "alpha:", alpha, "\n")      
+             cat(paste("statistic=",stat," criterion=bic", sep=''), "\n")      
            }, 
            "test"={
-             cat("criterion: test", "alpha:", alpha, "\n")      
+             cat(paste("statistic=",stat," criterion=test", " alpha=", alpha,sep=''), "\n")      
            })
   }   
 
+
+
+
+  
   changelist  <- NULL
   stepcount   <- 1
   modelChange <- FALSE
@@ -256,20 +304,38 @@ stepsplit1 <- function(object, type='ecc', criterion='aic', steps=1000, k=2, alp
   }
   
   if (details>=1){
-    cat("Stepwise splitting of colour classes, type:", type, "\n")  
+    ###cat("Stepwise splitting of colour classes, type:", type, "\n")  
+
+    typeStr <- ifelse (type=="vcc", "vertex colour classes", "edge colour classes")
+    cat("Stepwise splitting of", typeStr, "\n")
     switch(criterion,
            "aic"={
              if (k==2) 
-               cat("criterion: aic", "alpha:", alpha, "\n")  
+               cat(paste("statistic=",stat," criterion=aic",  sep=''), "\n")  
              else
-               cat("criterion: aic", "k:", k, "alpha:", alpha, "\n")  
+               cat(paste("statistic=",stat," criterion=aic", "k=", k, sep=''), "\n")  
            },
            "bic"={
-             cat("criterion: bic", "alpha:", alpha, "\n")      
+             cat(paste("statistic=",stat," criterion=bic", sep=''), "\n")      
            }, 
            "test"={
-             cat("criterion: test", "alpha:", alpha, "\n")      
+             cat(paste("statistic=",stat," criterion=test", " alpha=", alpha,sep=''), "\n")      
            })
+
+
+#     switch(criterion,
+#            "aic"={
+#              if (k==2) 
+#                cat("criterion: aic", "alpha:", alpha, "\n")  
+#              else
+#                cat("criterion: aic", "k:", k, "alpha:", alpha, "\n")  
+#            },
+#            "bic"={
+#              cat("criterion: bic", "alpha:", alpha, "\n")      
+#            }, 
+#            "test"={
+#              cat("criterion: test", "alpha:", alpha, "\n")      
+#            })
   }
   changelist <- NULL
   modelChange <- FALSE

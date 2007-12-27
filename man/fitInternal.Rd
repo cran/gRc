@@ -1,6 +1,6 @@
 \name{fitInteral}
 \alias{scoring}
-\alias{scoring.RCOX}
+\alias{scoring.rcox}
 \alias{ipm}
 \alias{ipm.rcon}
 \alias{ipm.rcor}

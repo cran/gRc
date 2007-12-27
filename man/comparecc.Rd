@@ -12,7 +12,7 @@ comparecc(object, cc1 = NULL, cc2 = NULL, type = "ecc", stat = "wald", details =
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{object}{An RCOX model, an object of class RCOX}
+  \item{object}{An RCOX model, an object of class 'rcox'}
   \item{cc1, cc2}{Lists of colour classes of type 'type', see 'details'
     for an explanation of the defaults.}
   \item{type}{Either "ecc" for edge colour classes or "vcc" for vertex
@@ -42,8 +42,8 @@ those specified in \code{cc1}. If \code{cc1=NULL} (the default) and
 % ~Make other sections like Warning with \section{Warning }{....} ~
 %}
 \seealso{
-  \code{\link{add1.RCOX}},
-  \code{\link{drop1.RCOX}},
+  \code{\link{add1.rcox}},
+  \code{\link{drop1.rcox}},
   \code{\link{stepadd1}},
   \code{\link{stepdrop1}},
   \code{\link{join1}},

@@ -23,7 +23,7 @@
 
 # Stop doing lineserach when steps have been halved more than 3 times...
 
-scoring.RCOX <- function(m, K0, ## =fitInfo(m, "K"),
+scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
                          control=m$control,
                          maxit=control$maxouter,
                          trace=m$trace){

@@ -4,7 +4,7 @@
 
 
 
-add1.RCOX <- function(object, scope, details=1, trace=0, ...){
+add1.rcox <- function(object, scope, details=1, trace=0, ...){
   n       <- dataRep(object,"n")
   if (missing(scope)){
     eNew <- getedges(object, complement=TRUE)
@@ -63,7 +63,7 @@ print.statTable <- function(x,...){
 ## Calculate test statistic for deletion of each ecc in the model
 ## Note: By default based on Wald statistics from existing model
 ##
-drop1.RCOX <- function(object, scope, details=1, trace=0, stat="wald", ...){
+drop1.rcox <- function(object, scope, details=1, trace=0, stat="wald", ...){
   stat <- match.arg(stat,c("wald","dev"))
   n   <- dataRep(object,"n")
 

@@ -1,5 +1,5 @@
 
-update.RCOX <- function(object,
+update.rcox <- function(object,
                         vcc       = NULL,
                         ecc       = NULL,
                         splitecc  = NULL,

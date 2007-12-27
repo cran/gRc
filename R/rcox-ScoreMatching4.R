@@ -20,7 +20,7 @@ rcorScoreMatch <- function(m, control=m$control, trace=0){
   n        <- getSlot(m, "dataRep")$n
   
   oclass       <- class(m)
-  class(m)     <- c("rcon","RCOX")
+  class(m)     <- c("rcon","rcox")
   K            <- theta2K(m, theta, scale='original')
   ## print("As RCON"); print(K)
 
@@ -145,7 +145,7 @@ rcorScoreTheta <- function(m){
   n        <- getSlot(m, "dataRep")$n
 
   oclass <- class(m)
-  class(m) <- c("rcon","RCOX")
+  class(m) <- c("rcon","rcox")
   K            <- theta2K(m, theta, scale='original')
   print(K)
   dimnames(K)  <- dimnames(S)
@@ -177,7 +177,7 @@ rcorScoreTheta <- function(m){
 
 #   ctrl   <- m$control
 #   ctrl$vcov <- NULL
-#   class(m) <- c("rcon","RCOX")
+#   class(m) <- c("rcon","rcox")
 #   KS       <- rconScoreMatch(m, control=ctrl)$K
 #   class(m) <- oclass
 #   K.curr   <- findKinModel(m, KS=KS, type='rcor', regularize=TRUE)

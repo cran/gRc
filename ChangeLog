@@ -1,0 +1,12 @@
+2007-12-27 Søren Højsgaard <sorenh@agrsci.dk>
+
+	* Some output has been modified
+
+	* Model objects changed from class RCOX to class rcox
+	
+	* gRc version 0.1.1 uploaded
+
+
+2007-12-20 Søren Højsgaard <sorenh@agrsci.dk>
+
+	* gRc version 0.1.0 uploaded to CRAN

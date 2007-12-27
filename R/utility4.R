@@ -28,7 +28,7 @@ fitInfo <- function(object,slot=NULL){
   getSlot(object,"fitInfo")[[slot]]
 }
 
-coef.RCOX <- function(object, ...){
+coef.rcox <- function(object, ...){
   co  <- fitInfo(object,"coef")
   co
 }

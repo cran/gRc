@@ -8,7 +8,7 @@ fit              <- function(object,
   UseMethod("fit")
 }
 
-fit.RCOX <- function(object,
+fit.rcox <- function(object,
                      method  = object$method,
                      control = object$control,
                      details = object$details,

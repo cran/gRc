@@ -1,5 +1,5 @@
-\name{update.RCOX}
-\alias{update.RCOX}
+\name{update.rcox}
+\alias{update.rcox}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{Update an RCOX model}
 \description{
@@ -9,7 +9,7 @@
   %call update with only one argument, for example if the data frame has been corrected
 }
 \usage{
-\method{update}{RCOX}(object, vcc = NULL, ecc = NULL, splitecc = NULL,
+\method{update}{rcox}(object, vcc = NULL, ecc = NULL, splitecc = NULL,
 splitvcc = NULL, joinvcc = NULL, joinecc = NULL, addecc = NULL, dropecc
 = NULL, Kstart = NULL, fit = TRUE, control=NULL, trace = object$trace, ...)
 }
@@ -34,7 +34,7 @@ splitvcc = NULL, joinvcc = NULL, joinecc = NULL, addecc = NULL, dropecc
 %  ~~ If necessary, more details than the description above ~~
 %}
 \value{
-  A new model object of class RCOX.
+  A new model object of class 'rcox'.
 }
 %\references{ ~put references to the literature/web site here ~ }
 \author{Søren Højsgaard, sorenh@agrsci.dk}
