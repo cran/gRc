@@ -1,3 +1,144 @@
+
+## Stepwise joining of existing colour classes in model
+##
+stepjoin1 <- function(object, scope, type='ecc', criterion='aic', steps=1000, k=2,
+                      alpha=0.05, stat="wald",
+                      details=1,trace=0)
+{
+  criterion <- match.arg(criterion, c("test","aic","bic"))
+  type      <- match.arg(type, c("ecc","vcc"))
+  stat      <- match.arg(stat, c("wald","dev"))
+
+  if (criterion %in% c("aic","bic")){
+    alpha <- 0
+  }
+  
+  if (details>=1){   
+    typeStr <- ifelse (type=="vcc", "vertex colour classes", "edge colour classes")
+    cat("Stepwise joining of", typeStr, "\n")
+    cat(.stepDetailsString(criterion, stat, k, alpha),"\n")
+  }   
+
+  if (missing(scope)){
+    scopecc <- getcc(object,type)
+  } else{
+    scopecc <- .addccnames(formula2names(scope),type=type)
+  }
+
+  currcc <- getcc(object,type)
+##  print("Start - scopecc:");  print(scopecc); print("--------------")
+  
+  x<-sapply(scopecc, function(e){
+    i <- match.containsLL2(e, currcc);
+    i
+  })
+  names(x)<-NULL
+  ##print(x)
+  
+  untouch     <- currcc[-x]
+  len.untouch <- length(untouch)
+  ##print(.addccnames(untouch,type)); print("------------")
+  
+  changelist  <- NULL
+  modelChange <- FALSE
+
+
+
+  stepcount   <- 1
+  repeat {
+    #print("Iteration - scopecc (before)"); print(scopecc)
+    cctab <- comparecc(object, cc1=scopecc, cc2=scopecc, type=type, stat=stat,
+                       details=details-1)
+    #print(cctab)
+    #print(cctab$cc1)
+    ##print(cctab$cc2)
+    tab   <- cctab$tab
+
+    if (is.null(tab))
+      return(object)
+    
+    statvalue <- .extractStat(tab, criterion, k)
+    idx       <- which.max(statvalue)
+    optstat   <- statvalue[idx]
+    if (details>=3)
+      print(tab)
+
+    if (optstat > alpha){
+      modelChange <- TRUE
+      ##cc          <- attributes(tab)$ccterms[[idx]]
+
+      ccid <- as.character(tab[idx,c("cc1","cc2")])
+      #print(ccid)
+      cc   <- cctab$cc1[ccid]
+      
+      if (details>=1){
+        cat("Joining", paste(ccid, collapse=' '),":",
+            paste(formula2string(names2formula(cc)), collapse="; "),"\n")
+        xxx <- tab[idx,-c(1:2)]
+        cat(.printTestResult(xxx),"\n")
+      }
+      ##print(cc); print(cctab$cc1[names(cc)]); ##print(cctab$cc2[idx]); 
+      
+      KS <- fitInfo(object,"K")
+
+      scopecc[names(cc)] <- NULL;      
+      scopecc <- .addccnames(.joincc(list(unlist(cc,recursive=FALSE)), scopecc), type)
+      #print("Iteration - scopecc (after)"); print(scopecc)
+
+      newcc <- .addccnames(unionL2L2(untouch, scopecc),type)
+      #print("newcc"); print(newcc)
+      
+      switch(type,
+             "ecc"={
+               object  <- update(object, ecc=newcc, trace=trace, fit=FALSE)
+             },
+             "vcc"={
+               object  <- update(object, vcc=newcc, trace=trace, fit=FALSE)
+             })
+
+
+
+
+      
+      KS     <- findKinModel(object, KS, type=object$type,regularize=TRUE)      
+      object <- update(object, Kstart=KS, fit=TRUE)
+      
+      stepcount  <- stepcount + 1
+      changelist <- c(changelist, cc)
+
+      #currcc <- getcc(object,type)
+      ##print("Iterate:");  print(currcc)
+      
+      if (stepcount>steps)
+        break()
+    } else {
+      if (details>=3){
+        print(tab)
+      }
+      break()
+    }
+    
+  }
+  object$change <- changelist
+  if (details>=1)
+    cat("\n")
+  if (modelChange)
+    return(object)
+}
+
+
+
+
+#       switch(type,
+#              "ecc"={
+#                object  <- update(object, joinecc=cc, trace=trace, fit=FALSE)
+#              },
+#              "vcc"={
+#                object  <- update(object, joinvcc=cc, trace=trace, fit=FALSE)
+#              })
+
+
+
 ##
 ## Stepwise addition of atomic ecc's
 ##
@@ -11,19 +152,6 @@ stepadd1 <- function(object, criterion="aic", steps=1000, k=2, alpha=0.05, detai
   if (details>=1){
 
     cat("Stepwise addition of atomic edge colour classes; ")  
-#     switch(criterion,
-#            "aic"={if (k==2) 
-#                     cat("criterion: aic", "alpha:", alpha, "\n")  
-#            else
-#              cat("criterion: aic", "k:", k, "alpha:", alpha, "\n")  
-#                 },
-#            "bic"={
-#              cat("criterion: bic", "alpha:", alpha, "\n")      
-#            }, 
-#            "test"={
-#              cat("criterion: test", "alpha:", alpha, "\n")      
-#            })
-
     switch(criterion,
            "aic"={
              if (k==2) 
@@ -115,23 +243,8 @@ stepdrop1 <- function(object, criterion='aic', steps=1000, k=2,   alpha=0.05, st
              cat(paste("statistic=",stat," criterion=bic", sep=''), "\n")      
            }, 
            "test"={
-             cat(paste("statistic=",stat," criterion=test", " alpha=", alpha,sep=''), "\n")      
+             cat(paste("statistic=",stat," criterion=test", " alpha=", alpha, sep=''), "\n")      
            })
-
-    
-#     cat("Stepwise dropping of edge colour classes; ")  
-#     switch(criterion,
-#            "aic"={if (k==2) 
-#                     cat("criterion: aic", "alpha:", alpha, "\n\n")  
-#            else
-#              cat("criterion: aic", "k:", k, "alpha:", alpha, "\n\n")  
-#                 },
-#            "bic"={
-#              cat("criterion: bic", "alpha:", alpha, "\n\n")      
-#            }, 
-#            "test"={
-#              cat("criterion: test", "alpha:", alpha, "\n\n")      
-#            })
   }
 
 
@@ -189,106 +302,8 @@ stepdrop1 <- function(object, criterion='aic', steps=1000, k=2,   alpha=0.05, st
 
 
 
-## Stepwise joining of existing colour classes in model
-##
-stepjoin1 <- function(object, type='ecc', criterion='aic', steps=1000, k=2,
-                      alpha=0.05, stat="wald",
-                      details=1,trace=0)
-{
-  criterion <- match.arg(criterion, c("test","aic","bic"))
-  type      <- match.arg(type, c("ecc","vcc"))
-  stat      <- match.arg(stat, c("wald","dev"))
-
-  if (criterion %in% c("aic","bic")){
-    alpha <- 0
-  }
-  
-  if (details>=1){
-
-    
-    typeStr <- ifelse (type=="vcc", "vertex colour classes", "edge colour classes")
-    cat("Stepwise joining of", typeStr, "\n")
-    switch(criterion,
-           "aic"={
-             if (k==2) 
-               cat(paste("statistic=",stat," criterion=aic",  sep=''), "\n")  
-             else
-               cat(paste("statistic=",stat," criterion=aic", "k=", k, sep=''), "\n")  
-           },
-           "bic"={
-             cat(paste("statistic=",stat," criterion=bic", sep=''), "\n")      
-           }, 
-           "test"={
-             cat(paste("statistic=",stat," criterion=test", " alpha=", alpha,sep=''), "\n")      
-           })
-  }   
 
 
-
-
-  
-  changelist  <- NULL
-  stepcount   <- 1
-  modelChange <- FALSE
-  repeat {
-    cctab <- comparecc(object, type=type, stat=stat, details=details-1)
-    tab   <- cctab$tab
-    
-    if (is.null(tab))
-      return(object)
-    statvalue <- .extractStat(tab, criterion, k)
-    idx  <- which.max(statvalue)
-    optstat <- statvalue[idx]
-    if (details>=3)
-      print(tab)
-
-    if (optstat>alpha){
-      cc <- attributes(tab)$ccterms[[idx]]
-      modelChange <- TRUE
-      if (details>=1){
-        ##cc <<- cc
-        #cat("Joining: ", toLisp(cc),"\n")
-        #cat("Joining:", formula2string(names2formula(cc))[[1]],"\n")
-        cat("Joining:",paste(formula2string(names2formula(cc)), collapse="; "),"\n")
-        ##cat("Joining:", formula2string(cc2formula(cc)),"\n")
-
-        xxx <- tab[idx,-c(1:2)]
-        cat(.printTestResult(xxx),"\n")
-      }
-
-      KS <- fitInfo(object,"K")
-
-      #KS <- NULL
-      #print(KS)
-      switch(type,
-             "ecc"={
-               object  <- update(object, joinecc=cc, trace=trace, fit=FALSE)
-             },
-             "vcc"={
-               object  <- update(object, joinvcc=cc, trace=trace, fit=FALSE)
-             })
-
-
-      KS <- findKinModel(object, KS, type=object$type,regularize=TRUE)      
-      object <- update(object, Kstart=KS,fit=TRUE)
-      
-      stepcount <- stepcount + 1
-      changelist <- c(changelist, cc)
-      if (stepcount>steps)
-        break()
-    } else {
-      if (details>=3){
-        print(tab)
-      }
-      break()
-    }
-  }
-  object$change <- changelist
-  if (details>=1)
-    cat("\n")
-  if (modelChange)
-    return(object)
-}
 
 
 ## Stepwise splitting of colour classes in model
@@ -321,23 +336,9 @@ stepsplit1 <- function(object, type='ecc', criterion='aic', steps=1000, k=2, alp
            "test"={
              cat(paste("statistic=",stat," criterion=test", " alpha=", alpha,sep=''), "\n")      
            })
-
-
-#     switch(criterion,
-#            "aic"={
-#              if (k==2) 
-#                cat("criterion: aic", "alpha:", alpha, "\n")  
-#              else
-#                cat("criterion: aic", "k:", k, "alpha:", alpha, "\n")  
-#            },
-#            "bic"={
-#              cat("criterion: bic", "alpha:", alpha, "\n")      
-#            }, 
-#            "test"={
-#              cat("criterion: test", "alpha:", alpha, "\n")      
-#            })
   }
-  changelist <- NULL
+  
+  changelist  <- NULL
   modelChange <- FALSE
   stepcount <- 1
   repeat {
@@ -417,4 +418,20 @@ stepsplit1 <- function(object, type='ecc', criterion='aic', steps=1000, k=2, alp
     "aic"  = {if (k==2) tab$aic else tab$dev+k*tab$df},
     "bic"  = {tab$bic},
     "test" = {tab$p})  
+}
+
+.stepDetailsString <- function(criterion, stat, k, alpha){
+  switch(criterion,
+         "aic"={
+           if (k==2) 
+             (paste("statistic=",stat," criterion=aic",  sep=''))  
+           else
+             (paste("statistic=",stat," criterion=aic", "k=", k, sep=''))  
+         },
+         "bic"={
+           (paste("statistic=",stat," criterion=bic", sep=''))      
+         }, 
+         "test"={
+           (paste("statistic=",stat," criterion=test", " alpha=", alpha,sep=''))      
+         })
 }

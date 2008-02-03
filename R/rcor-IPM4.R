@@ -16,48 +16,41 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
   VCC <- intRep(object,"vccI")
   V   <- NULL
 
-  maxit <- control$maxouter
   logL0       <- prevlogL <- ellK(K0,S,n-1)
-  #prevlogL <- prevlogL*10
   
-  logLeps     <- 1e-6 * abs(logL0)
+  maxit       <- control$maxouter
+  logLeps     <- control$logLeps * abs(logL0)
+
   logL.vec    <- rep(NA, maxit)
-  itcount     <- 1
   converged   <- FALSE
 
   ## Temporary model object with new controls
   ctrl        <- object$control
   ctrl$vccfit <- FALSE
   ctrl$vcov   <- NULL
-
   o2          <- object
   o2$control  <- ctrl
 
   ##C.curr    <- diag(1, nrow(S));     ## Initial C
-  C.curr    <- cov2cor(K0)
-  ##print(C.curr)
+  C.curr    <- cov2cor(K0)             ##print(C.curr)
   A         <- refitA(S,C.curr,VCC); ## First A estimate
+
   itcount <- 1
   while(!converged){
-    Q.curr  <- A * t((A*S)) ## Short for diag(A) %*% S %*% diag(A)
-    ##Q.curr           <- diag(A) %*% S %*% diag(A)
-    
-    o2$dataRep$S     <- Q.curr
+    Q.curr        <- A * t((A*S)) ## Short for diag(A) %*% S %*% diag(A)
+    o2$dataRep$S  <- Q.curr
 
-    C.curr <- rconIPM(o2,K0=C.curr, control=o2$control, trace=trace-1)$K
-    ## print("C.curr");    print(C.curr)
-    
-    K.curr <- A * t((A*C.curr)) ## Short for diag(A) %*% C.curr %*% diag(A)
-    ##K.curr <- diag(A) %*% C.curr %*% diag(A)
-
-    A      <- refitA(S, C.curr, VCC, Astart=A)
-
+    C.curr  <- rconIPM(o2,K0=C.curr, control=o2$control, trace=trace-1)$K
+    K.curr  <- A * t((A*C.curr)) ## Short for diag(A) %*% C.curr %*% diag(A)
+    A       <- refitA(S, C.curr, VCC, Astart=A)
     logL    <- ellK(K.curr,S,n-1);
     dlogL   <- logL - prevlogL
+    
     if (trace>=3)
       cat("...rcorIPM iteration", itcount, "logL:", logL, "dlogL:", dlogL, "\n")
+
     logL.vec[itcount]  <- logL
-    if ((logL-prevlogL) < logLeps)
+    if ((logL-prevlogL) < logLeps || itcount>=maxit)
       converged <- TRUE
     else {
       prevlogL <- logL;
@@ -65,33 +58,21 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
     }
   }
 
-  #logL <- ellK(K.curr,S,n-1)
-
   coef <- K2theta(object,K.curr, scale='original')
   vn   <- unlist(lapply(getcc(object),names))
   names(coef) <- vn
 
-
-#   V     <- NULL
-#   if (!is.null(control$vcov)){
-#     V <- calculateVCOV(object, K=K.curr, vcov=control$vcov, nboot=control$nboot)
-#   }
-
-  J <- getScore(object,K=K.curr)$J
-  dimnames(J) <- list(vn, vn)
-
-  
-  
+  if (!is.null(control$vcov)){
+    J  <- getScore(object,K=K.curr)$J
+    dimnames(J) <- list(vn, vn)
+  } else {
+    J <- NULL
+  }
+   
   dimnames(K.curr) <- dimnames(S)
   ans <- list(K=K.curr, logL=logL, coef=coef, J=J, logL.vec=logL.vec[1:itcount])
   return(ans)
-
-
 }
-
-
-
-
 
 refitA <- function(S,K,NSi,Astart=NULL,itmax=100){
 

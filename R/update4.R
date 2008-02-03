@@ -52,16 +52,17 @@ update.rcox <- function(object,
   
   if (!is.null(addecc)){
     old.ccl    <- getSlot(object,"ecc")
-    if (length(old.ccl)>0){
-        
+    if (length(old.ccl)>0){        
       if (is.L(addecc)){
         addecc <- lapply(addecc, list)
         class(addecc)<- c("colourClass", "list")
       }
-      
+      ##print("1111")
       addecc  <- .ccl2names(addecc, old.ccl)
+      ##print("2222")
       idx     <- sapply(addecc, function(e1)
                         any(is.na(sapply(e1, matchLL2, old.ccl))) )
+
       addecc  <- addecc[idx]
       new.ccl <- unionL2L2(addecc, old.ccl)
       ecc      <- new.ccl
@@ -69,9 +70,12 @@ update.rcox <- function(object,
       ecc <- addecc
     }    
     ecc    <- .addccnames(ecc, type="ecc")
+    ### print(ecc)
     if (trace>=1)cat(".add ecc:", toLisp(addecc),"\n")
   }
-    
+
+
+  
   if (!is.null(dropecc)){
     old.ccl    <- getSlot(object,"ecc")
     dropecc   <- .ccl2names(dropecc, old.ccl)
@@ -102,6 +106,10 @@ update.rcox <- function(object,
                                          dataNames = object$dataRep$dataNames,
                                          trace     = 2)
   object$intRep <- intRep
+  #if (!is.null(fitInfo(object,"K")))
+  #  object$Kstart <- fitInfo(object,"K")
+  #else
+
   object$Kstart <- Kstart
   
   if (!is.null(control)){
@@ -120,18 +128,23 @@ update.rcox <- function(object,
 
 
 
-
 .splitcc <- function(cc, old.ccl){
-  idx       <- sapply(cc, matchLL2,old.ccl)
+  idx       <- sapply(cc, matchLL2, old.ccl)
+  if ((length(idx)>1) || (!is.na(idx))){
+    old.ccl <- old.ccl[-idx]
+  }   
   new.cc    <- lapply(unlist(cc, recursive=FALSE),list)
-  new.ccl   <- unionL2L2(old.ccl[-idx],new.cc)
+  new.ccl   <- unionL2L2(old.ccl,new.cc)
   new.ccl
 }
 
 .joincc <- function(cc, old.ccl){
-  idx       <- sapply(cc, matchLL2,old.ccl)
-  new.cc    <- list(unlist(cc, recursive=FALSE))
-  new.ccl   <- unionL2L2(old.ccl[-idx],new.cc)
+  idx       <- sapply(cc, matchLL2, old.ccl)
+  if ((length(idx)>1) || (!is.na(idx))){
+    old.ccl <- old.ccl[-idx]
+  }   
+        new.cc         <- list(unlist(cc, recursive=FALSE))
+  new.ccl        <- unionL2L2(old.ccl, new.cc)
   class(new.ccl) <- union(class(old.ccl),class(cc))
   new.ccl
 }

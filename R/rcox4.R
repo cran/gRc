@@ -15,38 +15,46 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
   con <- list(
               vccfit   = TRUE,
               eccfit   = TRUE,
-              vcov     = {if(method=="scoring" || method=="ipm") "inf" else NULL},
-              nboot    = 100,
-              maxouter = 25,
-              maxinner = 25,
+              vcov     = "inf", #{if(method=="scoring" || method=="ipm") "inf" else NULL},
+              nboot    = 100, 
+              maxouter = 500,
+              maxinner = 250,
               logL     = FALSE,
               logLeps  = 1e-6,
-              deltaeps = 1e-6,
+              deltaeps = 1e-2,
               short    = FALSE
               )
 
   con[(namc <- names(control))] <- control
 
+  gmN   <- formula2names(gm)
+  vccN  <- formula2names(vcc)
+  eccN  <- formula2names(ecc)
+
+  usedVars <- unique(unlist(c(gmN, vccN, eccN)))
+  if (trace>=2) cat("..Building data representation\n")
+  dataRep <- .buildDataRepresentation (data, S, n, usedVars, type, trace)
+  
+
   if (trace>=2) cat("..Building standard representation\n")
-  stdRep   <- .buildStandardRepresentation (gm, vcc, ecc, trace)
+  stdRep   <- .buildStandardRepresentation (gmN, vccN, eccN,
+                                            dataNames=dataRep$dataNames, trace)
   vccN     <- stdRep$vccN
   eccN     <- stdRep$eccN
     
   vccN     <- .addccnames(vccN, type="vcc")
   eccN     <- .addccnames(eccN, type="ecc")
-  usedVars <- unique(unlist(c(vccN, eccN)))
-
-  if (trace>=2) cat("..Building data representation\n")
-  dataRep <- .buildDataRepresentation (data, S, n, usedVars, type, trace)
 
   nodes <- dataRep$nodes
   
   if (trace>=2) cat("..Building internal representation\n")
   intRep <- .buildInternalRepresentation(vccN=vccN, eccN=eccN,
                                          dataNames=dataRep$dataNames, trace)
+
   ans <- structure(list(##call    = match.call(),
                         vcc     = vccN,                        
                         ecc     = eccN,
+                        ###dim     = length(vccN)+length(eccN),
                         nodes   = nodes,
                         intRep  = intRep,
                         dataRep = dataRep,
@@ -58,11 +66,11 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
                         ),
                    class=c(type, "rcox"))
 
+  
   if (fit){
     ans$fitInfo <- .fitit(ans, method=method, trace=trace)
   }
   return(ans)
-
 }
 
 print.rcox <- function(x, ...){
@@ -93,12 +101,22 @@ print.rcox <- function(x, ...){
 
   vccI <- names2indices(vccN, dataNames)
   eccI <- names2indices(eccN, dataNames)
-  
-  eccI <- lapply(eccI, function(x) do.call("rbind",x))
-  vccI <- lapply(vccI, function(x) do.call("rbind",x))
 
+  eccI <- lapply(eccI, function(e) {names(e) <- NULL; e})
+  vccI <- lapply(vccI, function(e) {names(e) <- NULL; e}) 
+
+  eccI <- lapply(eccI, function(x1){ do.call("rbind",x1)})
+  vccI <- lapply(vccI, function(x2){ do.call("rbind",x2)})
+
+  ## To facilitate call to C-functions
+  vccI <- lapply(vccI,"storage.mode<-", "double")
+  eccI <- lapply(eccI,"storage.mode<-", "double")
+
+  eccI <<- eccI
+  vccI <<- vccI
+  
   if (trace>=6){
-    cat("...Internal representation:\n")
+    cat("......Internal representation:\n")
     print(tocc(vccI))
     print(tocc(eccI))
   }
@@ -106,13 +124,15 @@ print.rcox <- function(x, ...){
   return(invisible(ans))
 }
 
-.buildStandardRepresentation <- function(gm, vcc, ecc, trace=2){
+.buildStandardRepresentation <- function(gmN, vccN, eccN, dataNames, trace=2){
 
   ## Get from formulas to lists
   ##
-  gmN   <- formula2names(gm)
-  vccN  <- formula2names(vcc)
-  eccN  <- formula2names(ecc)
+  t0 <- proc.time()
+
+  ## print(gmN); print(vccN); print(eccN)
+  
+  ##cat("1:", proc.time()-t0,"\n")
   
   ## Get vertices/edges from gm-spec
   ##
@@ -122,31 +142,74 @@ print.rcox <- function(x, ...){
   x           <- unlist(lapply(gmN[idx>1], names2pairs),recursive=FALSE)
   gmNedges    <- lapply(x, list)
 
+  ##cat("2:", proc.time()-t0,"\n")
+
+  
   ## Make standard representation
   ##
 
   eccN <- c(eccN, gmNedges)
+  uuu  <- unlist(eccN)  
+  uuu  <- lapply(uuu, as.list)
+  vccN <- unique(c(uuu, vccN, gmNvertices))
 
-  uuu <- unlist(eccN)  
-  uuu <- lapply(uuu, as.list)
-  vccN <- c(uuu, vccN, gmNvertices)
+
+  
+  ##cat("3:", proc.time()-t0,"\n")
 
   ## Remove entries contained in other entries
   ##
-  vccN <-maximalSetL2(vccN)
-  eccN <-maximalSetL2(eccN)
   
-  varNames <- unique(unlist(c(vccN,eccN)))
+                                        #   vccN <<- vccN
+                                        #   eccN <<- eccN
+  
+                                        #   vccN <-maximalSetL2(vccN)
+                                        #   eccN <-maximalSetL2(eccN)
 
-  if (trace>=3){
-    cat("...Standard representation:\n")
-    print(tocc(vccN))
-    print(tocc(eccN))
-  }
+
+  vccI <- names2indices(vccN, dataNames)
+  eccI <- names2indices(eccN, dataNames)
+
+  ri <- .redundant.index(vccI)
+  vccN <- vccN[ri]
+
+  ri <- .redundant.index(eccI)
+  eccN <- eccN[ri]
+  
+  ##cat("4:", proc.time()-t0,"\n")
+  varNames <- unique(unlist(c(vccN,eccN)))
+  
+#   if (trace>=3){
+#     cat("...Standard representation:\n")
+#     print(tocc(vccN))
+#     print(tocc(eccN))
+#   }
   ans <- list(vccN=vccN, eccN=eccN, varNames=varNames)
   return(ans)
 
 
+}
+
+.redundant.index <- function(xxxx){
+  if (length(xxxx)==0)
+    return(FALSE) ## Not really intuitive, but it works...
+  else
+    if (length(xxxx)==1)
+      return(TRUE)
+  xxxx <<- xxxx
+  xxxx2 <- lapply(xxxx, function(x3){z<-do.call("rbind",x3); z[,1]<-z[,1]*10000; rowSums(z)})
+  ind <- rep(TRUE, length(xxxx2))
+  for (i in 1:length(xxxx2)){
+    xi <- xxxx2[[i]]
+    for (j in 1:length(xxxx2)){
+      if (i != j){
+        xj <- xxxx2[[j]]      
+        if (subsetof(xj,xi) && ind[i])
+          ind[j] <- FALSE      
+      }
+    }
+  }
+  ind
 }
 
 

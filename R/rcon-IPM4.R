@@ -12,15 +12,13 @@ rconIPM <- function(object, K0, control=object$control, trace=object$trace){
   vccI  <- getSlot(iR, "vccI")
   eccI  <- getSlot(iR, "eccI")
 
-  idxb    <- sapply(vccN, length)==1
-  ##idxb    <- sapply(vccN, nrow)==1
+  idxb    <- sapply(vccN, length)==1;  ##idxb    <- sapply(vccN, nrow)==1
   vccN.at <- vccN[idxb]
   vccI.at <- vccI[idxb]
   vccN.co <- vccN[!idxb]
   vccI.co <- vccI[!idxb]
   
-  idxb    <- sapply(eccN, length)==1
-  ##idxb    <- sapply(eccN, nrow)==1
+  idxb    <- sapply(eccN, length)==1;  ##idxb    <- sapply(eccN, nrow)==1
   eccN.at <- eccN[idxb]
   eccI.at <- eccI[idxb]
   eccN.co <- eccN[!idxb]
@@ -31,7 +29,7 @@ rconIPM <- function(object, K0, control=object$control, trace=object$trace){
 
   maxit       <- control$maxouter
   logL0       <- prevlogL <- ellK(K0,S,n-1)
-  logLeps     <- 1e-6 * abs(logL0)
+  logLeps     <- control$logLeps * abs(logL0)
   logL.vec    <- rep(NA, maxit)
   itcount     <- 1
   converged   <- FALSE
@@ -41,14 +39,17 @@ rconIPM <- function(object, K0, control=object$control, trace=object$trace){
   eccfit <- control$eccfit
   vccfit <- control$vccfit
 
+##  print(eccI.at)
   while(!converged){
 
     if (vccfit){
       Kwork <- fitIPSset(vccI.at, Kwork, S, n, control=control)$K
+      ##Kwork <- fitNR    (vccI.at, Kwork, S, n, type="vcc",control=control,trace=trace)$K
       Kwork <- fitNR    (vccI.co, Kwork, S, n, type="vcc",control=control,trace=trace)$K
     }
     if (eccfit){
-      Kwork <- fitIPSedge(eccI.at, Kwork, S, n, type='ecc',control=control)$K
+      ##Kwork <- fitIPSedge(eccI.at, Kwork, S, n, type='ecc',control=control)$K
+      Kwork <- fitNR     (eccI.at, Kwork, S, n, type='ecc',control=control,trace=trace)$K
       Kwork <- fitNR     (eccI.co, Kwork, S, n, type="ecc",control=control,trace=trace)$K
     }
     
@@ -57,34 +58,29 @@ rconIPM <- function(object, K0, control=object$control, trace=object$trace){
     if (trace>=3)
       cat("...rconIPM iteration", itcount, "logL:", logL, "dlogL:", dlogL, "\n")
     logL.vec[itcount]  <- logL
-    if ((logL-prevlogL) < logLeps)
+    if ((logL-prevlogL) < logLeps || itcount>=maxit)
       converged <- TRUE
     else {
       prevlogL <- logL;
       itcount  <- itcount + 1
     }
   }
+
+  
   coef <- K2theta(object,Kwork, scale='original')
   vn   <- unlist(lapply(getcc(object),names))
   names(coef) <- vn
-##  V     <- NULL
 
-
-#   if (!is.null(control$vcov)){
-#     V <- calculateVCOV(object, K=Kwork, vcov=control$vcov, nboot=control$nboot)
-#   }
-
-#   print(V)
-  #
-#  print(Kwork)
-  J <- getScore(object,K=Kwork)$J
-  vn <- unlist(lapply(getcc(object),names))
-  dimnames(J) <- list(vn, vn)
+  if (!is.null(control$vcov)){
+    J  <- getScore(object,K=Kwork)$J
+    dimnames(J) <- list(vn, vn)
+  } else {
+    J <- NULL
+  }
   
   ans <- list(K=Kwork, logL=logL, coef=coef, J=J, logL.vec=logL.vec[1:itcount])
   return(ans)
 }
-
 
 
 ## MATRIX VERSION
@@ -92,27 +88,25 @@ fitNR <- function(x, K, S, n, varIndex=1:nrow(K),type="ecc",control,trace){
   ##cat("--fitNR", type, "\n")
   ##print(x)
   if (length(x)){
-    #xmat <- switch(type,
-    #               "ecc"={.eccMat(x)},
-    #               "vcc"={.vccMat(x)}); ##  print(xmat)
 
-    #cat("fitNR(start): type:", type, "logL:", ellK(K,S,n-1), "\n")
+    ##cat("fitNR(start): type:", type, "logL:", ellK(K,S,n-1), "\n")
     for (i in 1:length(x)){
       cl    <- x[[i]];
-      #print(cl)
+      ##print(cl)
 
       # Make cl have two columns if it does not already have so
       if (ncol(cl)==1)
         clmat <- cbind(cl,cl)
       else
-        clmat <- cl
+        clmat <- rbind(cl,cl[,2:1])
 
       idx   <- sort(unique(as.numeric(cl)))
       cidx  <- setdiff(varIndex,idx);       
-      #print(idx); print(cidx)
       
       ## cl2: Version of cl which matches the lower dimensional matrices used later
       cl2 <- apply(cl,2,match,idx)
+      dim(cl2) <- dim(cl)
+      storage.mode(cl2) <- "double"
       #print(cl2)
       
       if (length(cidx)>0)
@@ -123,12 +117,14 @@ fitNR <- function(x, K, S, n, varIndex=1:nrow(K),type="ecc",control,trace){
       
       val<-modNewt(K, S, n, idx, cl, cl2, clmat, subt, type, control, trace)
       K <- val      
-      ##cat("fitNR(loop): type:", type, "logL:", ellK(K,S,n-1), "\n")
     }
     
   }
   logL <- ifelse (control[["logL"]], ellK(K,S,n-1), -9999)
-  #cat("fitNR: type:", type, "logL:", logL, "\n")
+  
+  ##cat("fitNR(loop): type:", type, "logL:", ellK(K,S,n-1), "\n")
+  ##cat("fitNR: type:", type, "logL:", logL, "\n")
+
   ans <- list(K=K, logL=logL)
   return(ans)
 }
@@ -138,8 +134,9 @@ modNewt <- function(K, S, n, idx, cl, cl2, clmat, subt, type, control,trace){
   f         <-  n-1;
   itcount   <-  0
   itmax     <-  control$maxinner
-  eps       <-  0.01
+  eps       <-  control$deltaeps
   prev.adj2 <-  0
+  ##print(cl)
   trSS2     <-  trAW(cl, S)
 
 #   print("modNEWT")
@@ -152,6 +149,7 @@ modNewt <- function(K, S, n, idx, cl, cl2, clmat, subt, type, control,trace){
   repeat{
     ##Sigma2    <-  cholSolve(K[idx,idx]-subt)
     Sigma2    <-  solve(K[idx,idx]-subt)
+                                        #print(cl2)
     trIS      <-  trAW(cl2,Sigma2)
     trISIS    <-  trAWBW(cl2, Sigma2, cl2)
     
@@ -159,15 +157,15 @@ modNewt <- function(K, S, n, idx, cl, cl2, clmat, subt, type, control,trace){
     #adj2     <-  Delta2 /(trISIS + 0.5*f*Delta2^2 )
     ##adj2     <-  Delta2 /(trISIS + 2*f*Delta2^2 )
     adj2      <-  Delta2 /(trISIS + 0.5*Delta2^2 )
-    
+
+
     K[clmat]  <- K[clmat]+adj2
     dadj2     <- (adj2 - prev.adj2)
     prev.adj2 <- adj2
     itcount   <- itcount + 1
-    logL <- ellK(K,S,n-1)
-
-    #dlogL <- logL-prevlogL
-    #print(c(itcount, logL, dlogL, abs(dadj2), min(eigen(K)$values)), digits=15)
+    ## logL <- ellK(K,S,n-1)
+    ## dlogL <- logL-prevlogL
+    ## print(c(itcount, logL, dlogL, abs(dadj2), min(eigen(K)$values)), digits=15)
 
     if (trace>=4)
     cat("....Modified Newton iteration", itcount, "parm change", dadj2,"\n")
@@ -254,8 +252,8 @@ fitIPSedge <- function(x, K, S, n, varIndex=1:nrow(K),type,control=NULL){
       notC  <- x.complements[[i]]; #print(notC)
       
       if (length(notC)>0)
-        ##subt <- K[C,notC,drop=FALSE]%*%cholSolve(K[notC,notC,drop=FALSE])%*%K[notC,C,drop=FALSE]
-        subt <- K[C,notC,drop=FALSE]%*%solve(K[notC,notC,drop=FALSE])%*%K[notC,C,drop=FALSE]
+        ##subt <- K[C,notC,drop=FALSE] %*% solve(K[notC,notC,drop=FALSE]) %*% K[notC,C,drop=FALSE]
+        subt <- K[C,notC,drop=FALSE] %*% solve(K[notC,notC,drop=FALSE],  K[notC,C,drop=FALSE])
       else
         subt <- 0
       
@@ -273,7 +271,6 @@ fitIPSedge <- function(x, K, S, n, varIndex=1:nrow(K),type,control=NULL){
   return(ans)
 }
 
-
 ## MATRIX VERSION
 fitIPSedge <- function(x, K, S, n, varIndex=1:nrow(K),type,control=NULL){
   #cat("fitIPSedge\n")
@@ -283,7 +280,13 @@ fitIPSedge <- function(x, K, S, n, varIndex=1:nrow(K),type,control=NULL){
     #  cat("\nFitting edge with modified IPS:",type," : ");
     #  cat(paste(x),"\n"); #lapply(x,function(a)print(c(a)))  
     #}
-    my.complement <- function(C) return(setdiff(varIndex,C))
+    my.complement <- function(C) {
+      #print(C)
+      a <- setdiff(varIndex,C)
+      #a<-varIndex[-C]
+      #print(a)
+      return(a)
+    }
     x.complements <- lapply(x, my.complement)
     
     for (i in 1:length(x)){

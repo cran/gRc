@@ -90,6 +90,8 @@ comparecc <- function(object, cc1=NULL, cc2=NULL, type='ecc', stat='wald', detai
   ccterms    <- ccterms[!sapply(ccterms, is.null)]
   ans        <- .nestedList2df(ans)  
   names(ans) <- c("cc1", "cc2", "X2")
+  ans[,"cc1"] <- as.character(ans[,"cc1"])
+  ans[,"cc2"] <- as.character(ans[,"cc2"])
 
   ans$df <- 1
   ans <- .addStat(ans, n=n)
@@ -97,6 +99,7 @@ comparecc <- function(object, cc1=NULL, cc2=NULL, type='ecc', stat='wald', detai
   ans2 <- structure(list(tab=ans, cc1=.addccnames(cc1,type), cc2=.addccnames(cc2,type),
                          details=details),
                     class=c("statTable","data.frame"))
+
   ans2
 
 }

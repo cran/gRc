@@ -8,7 +8,9 @@ plot.rcox <- function(x,y,...){
   vccList <- getSlot(m2,'vcc')
 
   coef <- coef(x)
-  
+
+  if (is.null(coef))
+    coef <- 1:c(length(eccList)+length(vccList))
   
   #l <- sapply(vccList, length)
   
@@ -35,7 +37,23 @@ plot.rcox <- function(x,y,...){
   nAttrs <- list()
   nAttrs$fillcolor <- vertexColors
 
-  G <- new("graphNEL", nodes=V)
+  edL <- vector("list", length=length(V))
+  names(edL) <- V
+  nv <- 1:length(V)
+  names(nv) <- V
+
+  ed <- unlist(eccList,recursive=FALSE)
+
+  for (i in 1:length(V)){
+    idx <- sapply(ed, function(x) is.element(V[i],x))
+    e <- setdiff (unlist(ed[idx]),V[i])
+    edL[[V[i]]] <- list(edges=nv[e])
+  }
+  edL<- edL[sapply(edL,length)>0]
+
+  G <- new("graphNEL", nodes=V, edgeL=edL)
+
+  ##G <- new("graphNEL", nodes=V)
   
   eccColors<-topo.colors(length(eccList))
 
@@ -49,8 +67,7 @@ plot.rcox <- function(x,y,...){
       for (j in 1:ltmp){
         ee <- tmp[[j]]
         ee <- ee[order(ee)]
-                                        #print(ee)
-        G <- addEdge(ee[1], ee[2], G, weight=1)
+        #G <- addEdge(ee[1], ee[2], G, weight=1)
         estr <- paste(ee[1],"~",ee[2],sep='')
         if (ltmp > 1){
           ecolor <- eccColors[i]
@@ -67,13 +84,7 @@ plot.rcox <- function(x,y,...){
     eAttrs <- list(color=edgeColors)
   else
     eAttrs <- list()
-
-  #cc <- rep(3, length(edgeColors))
-  #names(cc) <- names(edgeColors)
-  #eAttrs$lwd <- cc
   
   plot(G, "neato", nodeAttrs = nAttrs, edgeAttrs = eAttrs)
-
   #return(G)
-
 }

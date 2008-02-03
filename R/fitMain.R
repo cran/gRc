@@ -17,6 +17,9 @@ fit.rcox <- function(object,
   ans        <- .fitit(object, method=method, control=control,trace=trace)
 
   if (returnModel){
+    object$Kstart   <- ans$Kstart
+    ans$Kstart <- NULL
+    
     object$fitInfo  <- ans
     object$method   <- method
     return(object)
@@ -33,26 +36,26 @@ fit.rcox <- function(object,
                     trace   = m$trace){
   if (trace>=1) cat(".Fitting method: ", method, "\n")
   tstart <- proc.time()
+
+  if (is.null(m$Kstart))
+    Kstart    <- matching(m, trace=trace)$K
+  else
+    Kstart   <- findKinModel(m, KS=m$Kstart,type=m$type, regularize=TRUE)
+
+  Kstart <<- Kstart
   ans <- switch(method,
                 "matching"=
                 {
                   ##matching(m, control=control, trace=trace)
-                  ctrl      <- m$control;
-                  ctrl$vcov <- NULL
-                  Kstart    <- matching(m, control=ctrl, trace=trace)$K
+                  #ctrl      <- m$control;
+                  #ctrl$vcov <- NULL
+                  #Kstart    <- matching(m, control=ctrl, trace=trace)$K
                   scoring(m, K0=Kstart, control=control, maxit=1, trace=trace)
                   
                 },
                 "scoring"=,
                 "ipm"=
                 {
-                  if (is.null(m$Kstart)){
-                    ctrl      <- m$control;
-                    ctrl$vcov <- NULL
-                    Kstart    <- matching(m, control=ctrl, trace=trace)$K
-                  } else {
-                    Kstart <- m$Kstart
-                  }
                   switch(method,
                          "scoring"={
                            scoring(m, K0=Kstart, control=control, trace=trace)
@@ -60,9 +63,18 @@ fit.rcox <- function(object,
                          "ipm"={
                            ipm(m, K0=Kstart, control=control, trace=trace)         
                          })
+                },
+                "user"={
+                  m2 <- m
+                  ctrl          <- m$control
+                  ctrl$maxouter <- 5
+                  ctrl$vcov     <- NULL
+                  KK <-ipm(m2, K0=Kstart, control=ctrl, trace=trace)$K
+                  scoring(m, K0=KK, control=control, trace=trace)
                 }
          )
-  ans$method <-  method
+  ans$method <- method
+  ans$Kstart <- Kstart ## Hmmmm
   ans$time   <- (proc.time()-tstart)[3]
   return(ans)
 }

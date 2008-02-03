@@ -29,77 +29,84 @@ scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
                          trace=m$trace){
 
 
+  
   tstart <- proc.time()
-  if (trace>=2)cat("..Fitting model with scoring\n")
+  if (trace>=2)cat("..Fitting model with scoring",maxit,"\n")
   
   f       <- dataRep(m, 'n') - 1
   S       <- dataRep(m,'S')
-  V     <- NULL
-
-  #Kdiag <- diag(K0)
-  #Krest <- K0-Kdiag
-  ##Kmod <- Kdiag + 0.95*Krest
-  #K0 <- Kmod
-
-  logL0 <- ellK(K0, S, f)
+  logL0   <- ellK(K0, S, f)
 
   theta0      <- K2theta(m, K0, scale='free')
   curr.logL   <- logL0
   curr.theta  <- theta0
   
   curr.K      <- K0
-  logLeps     <- 1e-6 * abs(logL0)
-  ##print(logLeps)
+  logLeps     <- control$logLeps * abs(logL0); ##cat("Scoring: logLeps:",logLeps,"\n")
   logL.vec    <- rep(NA, maxit)
+  itcount     <- 0
 
+  ##K0 <<- K0
+  
   ## Iterate here...
+  ##
   if (trace>=3) cat("...Scoring start:", "logL:", curr.logL, "\n")
-  itcount <- 0
+
   repeat {
-    x       <- getScore(m, curr.K, scale='free') 
-    #print(x)
+    itcount <- itcount + 1
+    ##print("aaa")
+    x       <- getScore(m, curr.K, scale='free')
+    ##print("bbb")
     Sc      <- x$score
-    J       <- x$J
-    ## print(J)
-    ## stop()
-    ##print(solve(J))
-    DISC    <- try(qr.solve(J+ (Sc%*%t(Sc)/sqrt(f)), Sc)) ## /f
+    #J       <- x$J
+    DISC    <- try(qr.solve(x$J + (Sc%*%t(Sc)/sqrt(f)), Sc)) ## /f
     if (class(DISC)=='try-error'){
       cat("Error in Fisher scoring, please report...\n")
     }
 
+    Good          <- TRUE
     stepsize      <- 1
     stephalfcount <- 0
+
     repeat{
       new.theta   <- curr.theta + DISC*stepsize
       new.K       <- theta2K(m, new.theta, scale='free')
-
       new.logL    <- ellK(new.K, S, f)
       diff.logL   <- new.logL - curr.logL
-      ##print(diff.logL)
-      
-      if (is.na(new.logL) | (diff.logL < 0 & stephalfcount < 4)){
-        stephalfcount <- stephalfcount + 1
-        stepsize <- stepsize / 2
-        if(trace>=4) cat ("....New stepsize:", stepsize, "\n")
+
+      if (is.na(new.logL) || diff.logL<0){
+        if (stephalfcount<10){
+          stephalfcount <- stephalfcount + 1
+          stepsize      <- stepsize / 2
+          if(trace>=3) cat ("...logL:", new.logL, "outer it:",itcount,"New stepsize:", stepsize, "\n")
+        } else {
+          Good <- FALSE
+          break()
+        }
       } else {
         break()
       }
     }
+   
+    if (trace>=3) cat("...scoring iteration:", itcount, "logL:", new.logL, "dlogL",diff.logL,"\n")
 
-    itcount     <- itcount + 1
-    if (trace>=3) cat("...scoring iteration:", itcount, "logL:", new.logL, "\n")
+    if (Good){
+      curr.logL   <- new.logL
+      curr.theta  <- new.theta
+      curr.K      <- new.K
+      logL.vec[itcount] <- curr.logL
+    }
+
     
-    curr.logL   <- new.logL
-    curr.theta  <- new.theta
-    curr.K      <- new.K
-    logL.vec[itcount] <- curr.logL
-    
-    if (diff.logL < logLeps | itcount >= maxit){
+    if (!Good){
       break()
+    } else {
+      if (diff.logL < logLeps | itcount >= maxit){
+        break()
+      }
     }
   }
-
+  
   if (trace>=3) cat("...Scoring iterations:", itcount, "\n")
   logL.vec <- logL.vec[!is.na(logL.vec)]
 
@@ -107,24 +114,14 @@ scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
   names(new.theta) <- vn
 
   ## Back to original scale
-  l              <- length(getSlot(m, "vcc"))
-  new.theta[1:l] <- exp(new.theta[1:l])  ### CHECK - er det rigtigt for rcor???
-
+  l               <- length(getSlot(m, "vcc"))
+  new.theta[1:l]  <- exp(new.theta[1:l])  
   dimnames(new.K) <- dimnames(S)
-
-  #print("GET SCORE AT THE END...")
-  J       <- getScore(m, new.K, scale='original')$J
-
-#   print("J"); print(J)
-  
-#   if (!is.null(control$vcov)){
-#     V <- calculateVCOV(m, K=new.K, vcov=control$vcov, nboot=control$nboot)
-#   }
+  J       <- getScore(m, curr.K, scale='original')$J
 
   dimnames(J) <- list(vn, vn)
 
-  ans      <- list(K=new.K, logL=new.logL, coef=new.theta, J=J, logL.vec=logL.vec)
-
+  ans      <- list(K=new.K, logL=curr.logL, coef=new.theta, J=J, logL.vec=logL.vec)
   ##cat("scoring time:\n"); print(proc.time()-tstart)
   
   return(ans)
@@ -132,3 +129,21 @@ scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
 
 
 
+
+      ##if (is.na(new.logL) | (diff.logL < 0 & stephalfcount < 4)){
+     #  if (stephalfcount < 4 & (is.na(new.logL) || (!is.na(new.logL) & diff.logL < 0)  )){
+#         stephalfcount <- stephalfcount + 1
+#         stepsize <- stepsize / 2
+#         if(trace>=4) cat ("....logL:", new.logL, "New stepsize:", stepsize, "\n")
+#       } else {
+#         break()
+#       }
+
+
+
+
+#   print("J"); print(J)
+  
+#   if (!is.null(control$vcov)){
+#     V <- calculateVCOV(m, K=new.K, vcov=control$vcov, nboot=control$nboot)
+#   }

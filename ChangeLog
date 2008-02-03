@@ -1,3 +1,20 @@
+2007-01-08 Søren Højsgaard <sorenh@agrsci.dk>
+
+	* Bug fixed so that also unfitted models can be plotted
+
+	* extractIndexMatrix has been implemented in C (there remains an
+	issue of that the matrices are converted to doubles to get the
+	code to work. That should not be necessary?)
+
+	* Some trace functions are implemented in C
+
+	* Finding standard representation has been speeded up
+
+	* stepjoin1 now accepts a scope argument (stepsplit1 does not - yet!)
+
+	* Various minor bugs fixed.
+
+
 2007-12-27 Søren Højsgaard <sorenh@agrsci.dk>
 
 	* Some output has been modified

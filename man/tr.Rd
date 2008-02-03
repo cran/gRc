@@ -40,11 +40,20 @@ d <- 5
 W <- matrix(rnorm(d*d),nr=d,nc=d); 
 V <- W <- W+t(W)
 
-A1 <- list(c(1,2),c(1,3))
-A2 <- list(1,3,5)
+## Turn list into matrix
+##
+tomat <- function(x){
+  ans <- do.call("rbind", x)
+  storage.mode(ans)<-"double"
+  return(ans)
+}
 
-### Just for checking the calculations
-###
+A1 <- tomat(list(c(1,2),c(1,3)))
+A2 <- tomat(list(1,3,5))
+
+
+## Just for checking the calculations
+##
 symMat <- function(A,d){
   ans <- matrix(0,nr=d,nc=d)
   for (i in 1:length(A)){
@@ -55,6 +64,7 @@ symMat <- function(A,d){
       ans[e[1],e[2]] <-   ans[e[2],e[1]] <- 1 
     }
   }
+
   return(ans)
 }
 

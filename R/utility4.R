@@ -33,8 +33,14 @@ coef.rcox <- function(object, ...){
   co
 }
 
-getcc <- function(object){
-  list(vcc=object$vcc, ecc=object$ecc)
+getcc <- function(object,type){
+  if (missing(type))
+    list(vcc=object$vcc, ecc=object$ecc)
+  else {
+    switch(type,
+           "ecc"={object$ecc},
+           "vcc"={object$vcc})
+  }
 }
 
 getecc <- function(object){

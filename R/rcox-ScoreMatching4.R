@@ -9,6 +9,7 @@
   #m$control <- ctrl
 
 rcorScoreMatch <- function(m, control=m$control, trace=0){
+  tstart <- proc.time()
   if (trace>=2)
     cat("..Fitting with score matching\n")
   #theta     <- rcorScoreTheta(m)
@@ -55,7 +56,8 @@ rcorScoreMatch <- function(m, control=m$control, trace=0){
 
   logL   <- ellK(K, S, n-1)
   if (trace>=3)
-    cat("..Score matching, logL:", logL, "\n")
+    cat("..Score matching, logL:", logL, "Time:", proc.time()-tstart, "\n")
+
 
   return(list(K=K, logL=logL, coef=theta))
 }
@@ -67,6 +69,9 @@ rconScoreMatch <- function(m, control=m$control, trace=0){
     cat("..Fitting with score matching\n")
 
   theta <- rconScoreTheta(m)
+
+  ##cat("---", proc.time()-tstart,"\n")
+  
   vn           <- unlist(lapply(getcc(m),names))
   names(theta) <- vn
 
@@ -76,7 +81,7 @@ rconScoreMatch <- function(m, control=m$control, trace=0){
   K            <- theta2K(m, theta, scale='original')
   dimnames(K)  <- dimnames(S)
 
-  ##print("After score matching"); print(ellK(K,S,n-1))
+  ## print("After score matching"); print(ellK(K,S,n-1))
   ## Ensure diagonals are positive
   if (min(diag(K))<0){
     vccI <- intRep(m)$vccI
@@ -88,6 +93,8 @@ rconScoreMatch <- function(m, control=m$control, trace=0){
     diag(K) <- 1/dS
   }
 
+  ## cat("---", proc.time()-tstart,"\n")
+  
   if (min(eigen(K)$values)<0)
     K     <- regularizeK(K)
   
@@ -95,40 +102,97 @@ rconScoreMatch <- function(m, control=m$control, trace=0){
   ##print("After redoing diagonals"); print(logL)
 
   if (trace>=3)
-    cat("..Score matching, logL:", logL, "\n")
+    cat("..Score matching, logL:", logL, "Time:", proc.time()-tstart, "\n")
 
   ans <- list(K=K, logL=logL, coef=theta)
   return(ans)
 }
 
+# rconScoreThetaDiag <- function(m){
+#   iR <- getSlot(m, "intRep")
+#   vccTerms <- iR$vcc
+#   S    <- getSlot(m, "dataRep")$S
+#   n    <- getSlot(m, "dataRep")$n
+
+#   a <- B <- rep(0,length(vccTerms))
+#    for (u in 1:length(vccTerms)){
+#      Ku <- vccTerms[[u]]
+#      bu     <- trA(Ku)
+#      B[u]   <- bu
+#      a[u]   <- trAWB(Ku, S, Ku)
+#    }
+#   theta <- B/a
+
+#   theta <- c(theta, rep(0,length(iR$ecc)))
+  
+#   K            <- theta2K(m, theta, scale='original')
+#   dimnames(K)  <- dimnames(S)
+#   return(K)
+
+# }
 
 rconScoreTheta <- function(m){
 
-  iR <- getSlot(m, "intRep")
+  iR       <- getSlot(m, "intRep")
   vccTerms <- iR$vcc
   eccTerms <- iR$ecc
+
+  lvcc <- length(vccTerms)
+  lecc <- length(eccTerms)
+
   allTerms <- c(vccTerms, eccTerms)
 
   S    <- getSlot(m, "dataRep")$S
   n    <- getSlot(m, "dataRep")$n
 
-  A <- matrix(0, ncol=length(allTerms), nrow=length(allTerms))
+  A <- matrix(0, ncol=lvcc+lecc, nrow=lvcc+lecc)
   B <- rep(0,length(allTerms))
 
   #print(A)
-  
-  for (u in 1:length(allTerms)){
-    Ku <- allTerms[[u]]
-    #print(Ku)
+
+  for (u in 1:lvcc){
+    Ku     <- allTerms[[u]]
     bu     <- trA(Ku)
     B[u]   <- bu
-    for (v in u:length(allTerms)){
-      Kv <- allTerms[[v]]
-      auv    <- trAWB(Ku, S, Kv)      
-      A[v,u] <- A[u,v] <- auv
+    A[u,u] <- trAWB(Ku, S, Ku)
+  }
+
+  if (lecc>0){
+    for (u in 1:lvcc){
+      Ku      <- vccTerms[[u]]
+      for (v in 1:lecc){
+        Kv     <- eccTerms[[v]]
+        #if (!zeroAB(A,B)){
+          auv         <- trAWB(Ku, S, Kv)
+          A[u,v+lvcc] <- A[v+lvcc,u] <- auv
+        #}
+      }
+    }
+    
+    for (u in 1:lecc){
+      Ku      <- eccTerms[[u]]
+      for (v in u:lecc){
+        Kv     <- eccTerms[[v]]
+        auv    <- trAWB(Ku, S, Kv)      
+        A[u+lvcc,v+lvcc] <- A[v+lvcc,u+lvcc] <- auv      
+      }
     }
   }
-  #print(A); print(B)
+
+  #print(round(A))
+#   for (u in 1:length(allTerms)){
+#     Ku      <- allTerms[[u]]
+#     #bu     <- trA(Ku)
+#     #B[u]   <- bu
+#     for (v in u:length(allTerms)){
+#       Kv     <- allTerms[[v]]
+#       auv    <- trAWB(Ku, S, Kv)      
+#       A[v,u] <- A[u,v] <- auv
+#     }
+#   }
+
+  
+  ##print(dim(A))
   theta <- solve(A,B)  
   ##theta <- colSums(cholSolve(A)*B) ????  
   return(theta)

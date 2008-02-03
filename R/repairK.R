@@ -25,33 +25,41 @@ findKinModel.rcox <- function(m, KS, type="rcon", regularize=TRUE){
          },
          
          'rcon'={
+           KS2 <- KS;
+           KS2[,] <- 0; diag(KS2) <- diag(KS)
+           #print(KS)
            ##print("RCON")
            VCC <- intRep(m,"vccI")
            ECC <- intRep(m,"eccI")
+
            for (i in seq(along=ECC)){
              x      <- ECC[[i]]
-             if (nrow(x)>1){             
+             #if (nrow(x)>1){             
                x2    <- x[,2:1,drop=FALSE]
-               KS[x] <- KS[x2] <- mean(KS[x])
-             }
+               KS2[x] <- KS2[x2] <- mean(KS[x])
+             #}
            }
            
            for (i in seq(along=VCC)){
              x           <-unlist(VCC[[i]])
              if (nrow(x)>1){
                x           <- as.numeric(x)
-               diag(KS)[x] <- mean(diag(KS)[x])
+               diag(KS2)[x] <- mean(diag(KS)[x])
              }
            }
-           if (regularize && (min(eigen(KS)$values) < 0)){             
-             KKmod <- regularizeK(KS)
+           #print(KS2)
+           
+           if (regularize && (min(eigen(KS2)$values) < 0)){             
+             KKmod <- regularizeK(KS2)
            } else {
-             KKmod <- KS
+             KKmod <- KS2
            }
          }
          )
   return(KKmod)
 }
+
+
 
 ## K is made positive definite
 ##
@@ -61,14 +69,13 @@ regularizeK <- function(K){
   Krest <- K-Kdiag
   alpha <- 0.95
   repeat{
-    Kmod  <- Kdiag + alpha*Krest
-    
+    Kmod  <- Kdiag + alpha*Krest    
     if (min(eigen(Kmod)$values) > 0){
       Kmod <- Kdiag + 0.95*alpha*Krest ## Be on the safe side...
-      cat("The end", alpha,"\n")
+      ##cat("The end", alpha,"\n")
       break()
     }
-    alpha <- alpha-0.05    
+    alpha <- alpha-0.1    
   }
   Kmod
 }

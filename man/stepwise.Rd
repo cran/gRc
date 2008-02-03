@@ -16,13 +16,16 @@
 \usage{
 stepadd1  (object, criterion = "aic", steps = 1000, k = 2, alpha = 0.05, details=1, trace=0)
 stepdrop1 (object, criterion = "aic", steps = 1000, k = 2, alpha = 0.05, stat = "wald", details=1, trace=0) 
-stepjoin1 (object, type = "ecc", criterion = "aic", steps = 1000, k = 2, alpha = 0.05, stat = "wald",   details = 1, trace=0) 
+stepjoin1 (object, scope, type = "ecc", criterion = "aic", steps = 1000, k = 2, alpha = 0.05, stat = "wald",   details = 1, trace=0) 
 stepsplit1(object, type = "ecc", criterion = "aic", steps = 1000, k = 2, alpha = 0.05, stat = "wald",   details = 1, trace=0) 
 
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{An RCOX model, an object of class RCOX}
+  \item{scope}{A set (list) of items (edge colour classes or vertex
+    colour classes) to be considered. If missing, then
+    all items are considered.}
   \item{criterion}{Either "aic" (the default), "bic" or "test" (for
     significance test)}
   \item{type}{Either "ecc" for edge colour classes or "vcc" for vertex

@@ -130,13 +130,13 @@
 \alias{trAW2.list}
 \alias{trAW2.matrix}
 
-\alias{trAWB2}
-\alias{trAWB2.list}
-\alias{trAWB2.matrix}
+%\alias{trAWB2}
+\alias{trAWB.list}
+\alias{trAWB.matrix}
 
-\alias{trAWBW2}
-\alias{trAWBW2.list}
-\alias{trAWBW2.matrix}
+%\alias{trAWBW2}
+\alias{trAWBW.list}
+\alias{trAWBW.matrix}
 
 \alias{trAWBV2}
 \alias{trAWBV2.list}

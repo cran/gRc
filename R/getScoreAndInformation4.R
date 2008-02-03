@@ -6,11 +6,11 @@ getScore   <- function(m, K, scale='original'){
 getScore.rcon <- function(m, K, scale='original'){ ### OK !!!
 
   md    <- getSlot(m, 'dataRep')
-  fi    <- getSlot(m, 'fitInfo')
+  ## fi    <- getSlot(m, 'fitInfo')
   ir    <- getSlot(m, 'intRep')  
   S     <- md$S;  
   Sigma <- solve(K)
-
+  ##Sigma <- chol2inv(chol(  K  ))
   vccTerms <- ir$vccI
   eccTerms <- ir$eccI
   lvcc     <- length(vccTerms)
@@ -21,10 +21,11 @@ getScore.rcon <- function(m, K, scale='original'){ ### OK !!!
   J        <- matrix(0,nrow=nparm, ncol=nparm)
 
   f <- md$n-1; f2 <- f/2
-  
+
+  DSigma <- Sigma-S
   for (u in 1:lvcc){
     Ku <- vccTerms[[u]]
-    val <-  f2 * trAW(Ku, (Sigma-S))
+    val <-  f2 * trAW(Ku, DSigma)
     if (scale=='free')
       score[u] <- val * K[Ku[[1]],Ku[[1]]]
     else
@@ -34,15 +35,15 @@ getScore.rcon <- function(m, K, scale='original'){ ### OK !!!
   if (lecc>0){
     for (u in 1:lecc){
       Ku  <- eccTerms[[u]]
-      val <-  f2 * trAW(Ku, (Sigma-S))
+      val <-  f2 * trAW(Ku, DSigma)
       score[u+lvcc] <- val
     }    
   }  
 
   for (u in 1:lvcc){    ##print("V,V")
-    Ku <- term.u <- vccTerms[[u]]
+    Ku  <- vccTerms[[u]]
     for (v in u:lvcc){
-      Kv <- term.v <- vccTerms[[v]]
+      Kv  <- vccTerms[[v]]
       val <- f2* trAWBW(Ku, Sigma, Kv)      
       if (scale=='free')
         J[v,u] <- J[u,v] <- val * (K[Ku[[1]],Ku[[1]]]*K[Kv[[1]],Kv[[1]]])
@@ -53,9 +54,9 @@ getScore.rcon <- function(m, K, scale='original'){ ### OK !!!
 
   if (lecc>0){    ##print("V,E")    
     for (u in 1:lvcc){
-      Ku <- term.u <- vccTerms[[u]]
+      Ku  <- vccTerms[[u]]
       for (v in 1:lecc){
-        Kv <- term.v <- eccTerms[[v]]
+        Kv  <- eccTerms[[v]]
         val <- f2* trAWBW(Ku, Sigma, Kv)      
         if (scale=='free')
           J[u,v+lvcc] <- J[v+lvcc,u] <- val * K[Ku[[1]],Ku[[1]]]
@@ -65,9 +66,9 @@ getScore.rcon <- function(m, K, scale='original'){ ### OK !!!
     }
 
     for (u in 1:lecc){    ##print("E,E")    
-      Ku <- term.u <- eccTerms[[u]]
+      Ku  <- eccTerms[[u]]
       for (v in u:lecc){
-        Kv <- term.v <- eccTerms[[v]]
+        Kv  <- eccTerms[[v]]
         J[v+lvcc,u+lvcc] <-J[u+lvcc,v+lvcc] <- f2* trAWBW(Ku, Sigma, Kv)      
       }    
     }
@@ -95,23 +96,23 @@ getScore.rcor <- function(m,K, scale='original'){
   score    <- rep(NA, nparm)
   J        <- matrix(0,nrow=nparm, ncol=nparm)
 
-  C       <- cov2cor(K); 
-  Cinv    <- solve(C)             ## Brug IKKE cholSolve(C) - numerisk ustabil
+  C        <- cov2cor(K); 
+  Cinv     <- solve(C)             ## Brug IKKE cholSolve(C) - numerisk ustabil
 
-  a       <- sqrt(diag(K))        ## a indeholder eta'erne
-  A       <- diag(a)              
+  a        <- sqrt(diag(K))        ## a indeholder eta'erne
+  A        <- diag(a)              
 
-  ASA     <- a* t(a*S)
-  CASA    <- C %*% ASA
-  ACAS    <- (a * C) %*% (a * S)
+  ASA      <- a* t(a*S)
+  CASA     <- C %*% ASA
+  ACAS     <- (a * C) %*% (a * S)
 
   ## Run through VCC:
   for (u in 1:lvcc){
-
-    ## Score for VCC x VCC :
-    Ku <- term.u <- vccTerms[[u]]
-    val <-  f*(trA(Ku) - trAW(Ku, ACAS)) 
     
+    ## Score for VCC x VCC :
+    Ku  <-  vccTerms[[u]]
+    val <-  f*(trA(Ku) - trAW(Ku, ACAS)) 
+
     if (scale=='free')
       score[u] <- val
     else
@@ -120,23 +121,17 @@ getScore.rcor <- function(m,K, scale='original'){
 
     ## Information for VCC
     for (v in 1:lvcc){
-      Kv <- term.v <- vccTerms[[v]]      
-      #print(Ku); print(Kv)
+      Kv  <- vccTerms[[v]]      
 
       if (u==v)
         val <- 2*f* trAWBV(Ku, Cinv, Kv, C) ## OK, sept 07
       else
         val <- f * trAWBV(Ku, Cinv, Kv, C) ## OK, sept 07
-
-      #print("---->>>----")
-      #print(c(Ku[1,],Kv[1,]))
-      #print(c(Ku[[1]],Kv[[1]], val))
       
       if (scale=='original')
         val <- val / (A[Ku[[1]],Ku[[1]]]*A[Kv[[1]],Kv[[1]]])
 
-      #print(val)
-      J[u,v] <- val
+      J[u,v] <- J[v,u] <-val
     }    
   }
 
@@ -162,12 +157,13 @@ getScore.rcor <- function(m,K, scale='original'){
     
     for (u in 1:lecc){
       ## Score for ECC x ECC
-      Ku <- term.u <- eccTerms[[u]]
-      for (v in 1:lecc){
-        Kv <- term.v <- eccTerms[[v]]
-        J[u+lvcc,v+lvcc] <- (f/2)* trAWBW(Ku, Cinv, Kv)   ## OK, sept 07
+      Ku <- eccTerms[[u]]
+      for (v in u:lecc){
+        Kv  <- eccTerms[[v]]
+        J[u+lvcc,v+lvcc] <- J[v+lvcc,u+lvcc] <- (f/2)* trAWBW(Ku, Cinv, Kv) ## OK, sept 07
       }    
     }
+    
   }
   ##print(J)
   return(list(score=score, J=J))
