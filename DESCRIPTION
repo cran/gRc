@@ -1,5 +1,5 @@
 Package: gRc
-Version: 0.1.2
+Version: 0.1.4
 Title:   Inference in Graphical Gaussian Models with Edge and Vertex Symmetries
 Author:  Søren Højsgaard <sorenh@agrsci.dk> Steffen L. Lauritzen <steffen@stats.ox.ac.uk>
 Maintainer: Søren Højsgaard <sorenh@agrsci.dk> 
@@ -7,4 +7,4 @@ Description: Estimation, model selection and other aspects of statistical infere
 License: GPL
 Encoding: latin1
 Depends: MASS,gRbase,Rgraphviz
-Packaged: Sun Feb  3 18:01:34 2008; shd
+Packaged: Tue Mar 11 09:50:17 2008; shd

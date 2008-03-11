@@ -31,12 +31,21 @@ scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
 
   
   tstart <- proc.time()
-  if (trace>=2)cat("..Fitting model with scoring",maxit,"\n")
+  if (trace>=2)
+    cat("..Fitting model with scoring",maxit,"\n")
   
-  f       <- dataRep(m, 'n') - 1
-  S       <- dataRep(m,'S')
+  ##f       <- dataRep(m, 'n') - 1
+  ##S       <- dataRep(m,'S')
+
+  f       <- m$dataRep$n - 1
+  S       <- m$dataRep$S
+
   logL0   <- ellK(K0, S, f)
 
+  type    <- m$type
+  
+  fscale  <- f #sqrt(f)
+    
   theta0      <- K2theta(m, K0, scale='free')
   curr.logL   <- logL0
   curr.theta  <- theta0
@@ -45,8 +54,6 @@ scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
   logLeps     <- control$logLeps * abs(logL0); ##cat("Scoring: logLeps:",logLeps,"\n")
   logL.vec    <- rep(NA, maxit)
   itcount     <- 0
-
-  ##K0 <<- K0
   
   ## Iterate here...
   ##
@@ -54,12 +61,11 @@ scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
 
   repeat {
     itcount <- itcount + 1
-    ##print("aaa")
     x       <- getScore(m, curr.K, scale='free')
-    ##print("bbb")
+
     Sc      <- x$score
     #J       <- x$J
-    DISC    <- try(qr.solve(x$J + (Sc%*%t(Sc)/sqrt(f)), Sc)) ## /f
+    DISC    <- try(qr.solve(x$J + (Sc%*%t(Sc)/fscale), Sc))
     if (class(DISC)=='try-error'){
       cat("Error in Fisher scoring, please report...\n")
     }

@@ -1,23 +1,15 @@
 
-## iR <- getSlot(m, "intRep")
-## vccTerms <- iR$vcc
-## eccTerms <- iR$ecc
-## allTerms <- c(vccTerms, eccTerms)
-
-  #ctrl      <- control
-  ##ctrl$vcov <- NULL ## We don't want vcov calculated until at the end...
-  #m$control <- ctrl
-
 rcorScoreMatch <- function(m, control=m$control, trace=0){
   tstart <- proc.time()
   if (trace>=2)
-    cat("..Fitting with score matching\n")
+    cat("..Fitting with score matching (rcor)\n")
   #theta     <- rcorScoreTheta(m)
   theta        <- rconScoreTheta(m)
   vn           <- unlist(lapply(getcc(m),names))
   names(theta) <- vn
 
   S        <- getSlot(m, "dataRep")$S
+  ##Sorig    <- getSlot(m, "dataRep")$Sorig ## BRIS
   n        <- getSlot(m, "dataRep")$n
   
   oclass       <- class(m)
@@ -55,6 +47,8 @@ rcorScoreMatch <- function(m, control=m$control, trace=0){
   ## dimnames(K)  <- dimnames(S)
 
   logL   <- ellK(K, S, n-1)
+
+  ##cat(">>logL (scale):", logL, "logL (orig):", ellK(K,Sorig,n-1),"\n")
   if (trace>=3)
     cat("..Score matching, logL:", logL, "Time:", proc.time()-tstart, "\n")
 
@@ -76,6 +70,7 @@ rconScoreMatch <- function(m, control=m$control, trace=0){
   names(theta) <- vn
 
   S        <- getSlot(m, "dataRep")$S
+  ## Sorig    <- getSlot(m, "dataRep")$Sorig ## BRIS
   n        <- getSlot(m, "dataRep")$n
     
   K            <- theta2K(m, theta, scale='original')
@@ -100,36 +95,13 @@ rconScoreMatch <- function(m, control=m$control, trace=0){
   
   logL  <- ellK(K,S,n-1)
   ##print("After redoing diagonals"); print(logL)
-
+  
   if (trace>=3)
     cat("..Score matching, logL:", logL, "Time:", proc.time()-tstart, "\n")
 
   ans <- list(K=K, logL=logL, coef=theta)
   return(ans)
 }
-
-# rconScoreThetaDiag <- function(m){
-#   iR <- getSlot(m, "intRep")
-#   vccTerms <- iR$vcc
-#   S    <- getSlot(m, "dataRep")$S
-#   n    <- getSlot(m, "dataRep")$n
-
-#   a <- B <- rep(0,length(vccTerms))
-#    for (u in 1:length(vccTerms)){
-#      Ku <- vccTerms[[u]]
-#      bu     <- trA(Ku)
-#      B[u]   <- bu
-#      a[u]   <- trAWB(Ku, S, Ku)
-#    }
-#   theta <- B/a
-
-#   theta <- c(theta, rep(0,length(iR$ecc)))
-  
-#   K            <- theta2K(m, theta, scale='original')
-#   dimnames(K)  <- dimnames(S)
-#   return(K)
-
-# }
 
 rconScoreTheta <- function(m){
 
@@ -206,6 +178,7 @@ rcorScoreTheta <- function(m){
   names(theta) <- vn
 
   S        <- getSlot(m, "dataRep")$S
+  Sorig        <- getSlot(m, "dataRep")$Sorig
   n        <- getSlot(m, "dataRep")$n
 
   oclass <- class(m)
@@ -270,3 +243,38 @@ rcorScoreTheta <- function(m){
 #    cat("Score matching gave n.d. K; regularizing to make K p.d.\n")
 #    K <- regularizeK(K)
 #  }   
+
+
+
+## iR <- getSlot(m, "intRep")
+## vccTerms <- iR$vcc
+## eccTerms <- iR$ecc
+## allTerms <- c(vccTerms, eccTerms)
+
+  #ctrl      <- control
+  ##ctrl$vcov <- NULL ## We don't want vcov calculated until at the end...
+  #m$control <- ctrl
+
+
+# rconScoreThetaDiag <- function(m){
+#   iR <- getSlot(m, "intRep")
+#   vccTerms <- iR$vcc
+#   S    <- getSlot(m, "dataRep")$S
+#   n    <- getSlot(m, "dataRep")$n
+
+#   a <- B <- rep(0,length(vccTerms))
+#    for (u in 1:length(vccTerms)){
+#      Ku <- vccTerms[[u]]
+#      bu     <- trA(Ku)
+#      B[u]   <- bu
+#      a[u]   <- trAWB(Ku, S, Ku)
+#    }
+#   theta <- B/a
+
+#   theta <- c(theta, rep(0,length(iR$ecc)))
+  
+#   K            <- theta2K(m, theta, scale='original')
+#   dimnames(K)  <- dimnames(S)
+#   return(K)
+
+# }

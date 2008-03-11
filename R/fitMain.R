@@ -1,28 +1,28 @@
-fit              <- function(object,
-                             method  = object$method,
-                             control = object$control,
-                             details = object$details,
-                             trace   = object$trace,
-                             returnModel=TRUE
-                             ){
-  UseMethod("fit")
-}
+# fit <- function(object,
+#                 method  = object$method,
+#                 control = object$control,
+#                 details = object$details,
+#                 trace   = object$trace,
+#                 returnModel=TRUE
+#                 ){
+#   UseMethod("fit")
+# }
 
-fit.rcox <- function(object,
-                     method  = object$method,
-                     control = object$control,
-                     details = object$details,
-                     trace   = object$trace,
-                     returnModel=TRUE){
-  ans        <- .fitit(object, method=method, control=control,trace=trace)
+fit.rcox <- function(m,
+                     method  = m$method,
+                     control = m$control,
+                     details = m$details,
+                     trace   = m$trace,
+                     returnModel=TRUE,...){
+
+  ans        <- .fitit(m, method=method, control=control,trace=trace)
 
   if (returnModel){
-    object$Kstart   <- ans$Kstart
-    ans$Kstart <- NULL
-    
-    object$fitInfo  <- ans
-    object$method   <- method
-    return(object)
+    m$Kstart   <- ans$Kstart
+    ans$Kstart      <- NULL    
+    m$fitInfo  <- ans
+    m$method   <- method
+    return(m)
   } else {
     return(ans)
   }
@@ -42,16 +42,10 @@ fit.rcox <- function(object,
   else
     Kstart   <- findKinModel(m, KS=m$Kstart,type=m$type, regularize=TRUE)
 
-  Kstart <<- Kstart
   ans <- switch(method,
                 "matching"=
                 {
-                  ##matching(m, control=control, trace=trace)
-                  #ctrl      <- m$control;
-                  #ctrl$vcov <- NULL
-                  #Kstart    <- matching(m, control=ctrl, trace=trace)$K
                   scoring(m, K0=Kstart, control=control, maxit=1, trace=trace)
-                  
                 },
                 "scoring"=,
                 "ipm"=
@@ -69,7 +63,7 @@ fit.rcox <- function(object,
                   ctrl          <- m$control
                   ctrl$maxouter <- 5
                   ctrl$vcov     <- NULL
-                  KK <-ipm(m2, K0=Kstart, control=ctrl, trace=trace)$K
+                  KK  <-ipm(m2, K0=Kstart, control=ctrl, trace=trace)$K
                   scoring(m, K0=KK, control=control, trace=trace)
                 }
          )
@@ -78,9 +72,6 @@ fit.rcox <- function(object,
   ans$time   <- (proc.time()-tstart)[3]
   return(ans)
 }
-
-
-
 
 matching      <- function(m, control=m$control, trace=m$trace){
   UseMethod("matching")

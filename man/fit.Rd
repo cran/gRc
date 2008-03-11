@@ -8,12 +8,12 @@
   RCOR models) using different estimation algorithms.
 }
 \usage{
-fit(object, method = object$method, control = object$control,
-details = object$details, trace = object$trace, returnModel = TRUE)
+\method{fit}{rcox}(m, method = m$method, control = m$control,
+details = m$details, trace = m$trace, returnModel = TRUE,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{object}{An RCOX model object (an object of class 'rcox')}
+  \item{m}{An RCOX model object (an object of class 'rcox')}
   \item{method}{The specific estimation method. Can be either "scoring",
     (a modified Fisher scoring algorithm),
     "ipm" (iterative partial maximization), "matching" (score matching)
@@ -26,6 +26,7 @@ details = object$details, trace = object$trace, returnModel = TRUE)
     feature not intended for the user.}
   \item{returnModel}{If TRUE the model object m is returned with fitting
     info added to it. If FALSE only the fitting info is returned.}
+  \item{...}{Additional arguments; currently not used.}
 }
 \details{
   The fitted parameters etc. can be extracted using 'fitInfo(m)'.

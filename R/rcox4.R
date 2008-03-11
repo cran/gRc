@@ -2,8 +2,7 @@
 rcox <- function(gm=NULL, vcc=NULL, ecc=NULL, 
                  type   = c('rcon','rcor'),
                  method = c("scoring","ipm", "matching", "user"),
-                 fit=TRUE, data=NULL, S=NULL, n=NULL,
-                 Kstart=NULL,
+                 fit=TRUE, data=NULL, S=NULL, n=NULL, Kstart=NULL,
                  control=list(),
                  details=1,
                  trace=0){
@@ -32,27 +31,32 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
   eccN  <- formula2names(ecc)
 
   usedVars <- unique(unlist(c(gmN, vccN, eccN)))
-  if (trace>=2) cat("..Building data representation\n")
+
+  if (trace>=2)
+    cat("..Building data representation\n")
+
   dataRep <- .buildDataRepresentation (data, S, n, usedVars, type, trace)
   
+  if (trace>=2)
+    cat("..Building standard representation\n")
 
-  if (trace>=2) cat("..Building standard representation\n")
   stdRep   <- .buildStandardRepresentation (gmN, vccN, eccN,
                                             dataNames=dataRep$dataNames, trace)
   vccN     <- stdRep$vccN
   eccN     <- stdRep$eccN
-    
+  
   vccN     <- .addccnames(vccN, type="vcc")
   eccN     <- .addccnames(eccN, type="ecc")
 
-  nodes <- dataRep$nodes
+  nodes    <- dataRep$nodes
   
-  if (trace>=2) cat("..Building internal representation\n")
+  if (trace>=2)
+    cat("..Building internal representation\n")
+
   intRep <- .buildInternalRepresentation(vccN=vccN, eccN=eccN,
                                          dataNames=dataRep$dataNames, trace)
 
-  ans <- structure(list(##call    = match.call(),
-                        vcc     = vccN,                        
+  ans <- structure(list(vcc     = vccN,                        
                         ecc     = eccN,
                         ###dim     = length(vccN)+length(eccN),
                         nodes   = nodes,
@@ -74,7 +78,9 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
 }
 
 print.rcox <- function(x, ...){
+
   cat(toupper(getSlot(x,"type")), "model: ")
+
   if (!is.null(x$fitInfo)){
     cat("logL=", x$fitInfo$logL, " dimension=", dimension(x),
         " method=", x$method, " time=", fitInfo(x,"time"),sep='')
@@ -82,15 +88,16 @@ print.rcox <- function(x, ...){
   cat("\n")
 
   if (!(x$control$short)){
-    xcc <-getvcc(x)
+    xcc <- getvcc(x)
+    xcc <- getecc(x)
+    
     xf  <- names2formula(xcc)
-    xs  <-formula2string(xf)
+    xs  <- formula2string(xf)
     cat("vcc: ",paste(unlist(xs),collapse=", "),"\n")
     
-    xcc <-getecc(x)
     if (length(xcc)){
       xf  <- names2formula(xcc)
-      xs  <-formula2string(xf)
+      xs  <- formula2string(xf)
       cat("ecc: ",paste(unlist(xs),collapse=", "),"\n")
     }
   }
@@ -112,8 +119,8 @@ print.rcox <- function(x, ...){
   vccI <- lapply(vccI,"storage.mode<-", "double")
   eccI <- lapply(eccI,"storage.mode<-", "double")
 
-  eccI <<- eccI
-  vccI <<- vccI
+  ##eccI <<- eccI
+  ##vccI <<- vccI
   
   if (trace>=6){
     cat("......Internal representation:\n")
@@ -131,12 +138,10 @@ print.rcox <- function(x, ...){
   t0 <- proc.time()
 
   ## print(gmN); print(vccN); print(eccN)
-  
   ##cat("1:", proc.time()-t0,"\n")
   
   ## Get vertices/edges from gm-spec
   ##
-  
   idx         <- sapply(gmN, length)
   gmNvertices <- lapply(unique(unlist(gmN)),list) ## lapply(gmN[idx==1], list)
   x           <- unlist(lapply(gmN[idx>1], names2pairs),recursive=FALSE)
@@ -144,28 +149,12 @@ print.rcox <- function(x, ...){
 
   ##cat("2:", proc.time()-t0,"\n")
 
-  
   ## Make standard representation
   ##
-
   eccN <- c(eccN, gmNedges)
   uuu  <- unlist(eccN)  
   uuu  <- lapply(uuu, as.list)
   vccN <- unique(c(uuu, vccN, gmNvertices))
-
-
-  
-  ##cat("3:", proc.time()-t0,"\n")
-
-  ## Remove entries contained in other entries
-  ##
-  
-                                        #   vccN <<- vccN
-                                        #   eccN <<- eccN
-  
-                                        #   vccN <-maximalSetL2(vccN)
-                                        #   eccN <-maximalSetL2(eccN)
-
 
   vccI <- names2indices(vccN, dataNames)
   eccI <- names2indices(eccN, dataNames)
@@ -179,25 +168,20 @@ print.rcox <- function(x, ...){
   ##cat("4:", proc.time()-t0,"\n")
   varNames <- unique(unlist(c(vccN,eccN)))
   
-#   if (trace>=3){
-#     cat("...Standard representation:\n")
-#     print(tocc(vccN))
-#     print(tocc(eccN))
-#   }
   ans <- list(vccN=vccN, eccN=eccN, varNames=varNames)
   return(ans)
-
-
 }
 
 .redundant.index <- function(xxxx){
+
   if (length(xxxx)==0)
     return(FALSE) ## Not really intuitive, but it works...
   else
     if (length(xxxx)==1)
       return(TRUE)
-  xxxx <<- xxxx
-  xxxx2 <- lapply(xxxx, function(x3){z<-do.call("rbind",x3); z[,1]<-z[,1]*10000; rowSums(z)})
+
+  xxxx2 <- lapply(xxxx, function(x3)
+                  {z<-do.call("rbind",x3); z[,1]<-z[,1]*10000; rowSums(z)})
   ind <- rep(TRUE, length(xxxx2))
   for (i in 1:length(xxxx2)){
     xi <- xxxx2[[i]]
@@ -212,53 +196,31 @@ print.rcox <- function(x, ...){
   ind
 }
 
-
-
 .buildDataRepresentation <- function(data=NULL, S=NULL, n=NULL, nodes, type="rcon",
                                      trace=2){
   if (is.null(data) & is.null(S)){
     stop("No data given...\n")
   }
   
-  #print(nodes)
-
   if (!is.null(data)){    
     dataNames <- names(data)  
-    S <- cov(data)
-    n <- nrow(data)##+1
+    S         <- cov(data)
+    n         <- nrow(data)##+1
   } else {
     dataNames <- colnames(S)
   }
 
   nodes     <- dataNames[sort(match(nodes, dataNames))]
   
-  S <- S[nodes, nodes]
-  if (type=="rcor"){
-    ##cat("Rescaling S\n")
-    S <- cov2cor(S)
-  }
+  S <-  S[nodes, nodes]
+#   if (type=="rcor"){
+#     ##cat("Rescaling S\n")
+#     S <- cov2cor(S)
+#   } 
   
-  ans <- list(S=S,n=n, dataNames=rownames(S), nodes=nodes)
+  ans <- list(S=S, n=n, dataNames=rownames(S), nodes=nodes)
 
   return(ans)
 }
 
-
-  
-  ##nodes     <- dataNames[sort(match(nodes, dataNames))]
-
-
-
-
-  
-  #cat("vcc: ", cc2str(getSlot(x,'vcc')),"\n")
-  #cat("ecc: ", cc2str(getSlot(x,'ecc')),"\n")
-
-  # cat("vcc:\n")
-#   aa<-lapply(getSlot(x,"vcc"),cc2str)
-#   lapply(aa, cat, "\n")
-
-#   cat("ecc:\n")
-#   aa<-lapply(getSlot(x,"ecc"),cc2str)
-#   lapply(aa, cat, "\n")
 
