@@ -8,7 +8,7 @@
 }
 \usage{
 rcox(gm = NULL, vcc = NULL, ecc = NULL, type = c("rcon", "rcor"),
-method = c("scoring", "ipm", "matching", "user"),
+method = c("scoring", "ipm", "matching", "hybrid1"),
 fit = TRUE, data = NULL, S = NULL, n = NULL, Kstart, control = list(),
 details=1, trace=0)
 }
@@ -22,7 +22,7 @@ details=1, trace=0)
   \item{method}{Estimation method. Default is 'scoring' which is
     stabilised Fisher scoring. An alternative is 'ipm' which is
     iterative partial maximisation. The method 'matching' is score
-    matching followed by one step with Fisher scoring.  The method 'user' are for
+    matching followed by one step with Fisher scoring.  The method 'hybrid1' is for
     internal use and should not be called directly}
   \item{fit}{Should the model be fitted}
   \item{data}{A dataframe}

@@ -106,10 +106,6 @@ update.rcox <- function(object,
                                          dataNames = object$dataRep$dataNames,
                                          trace     = 2)
   object$intRep <- intRep
-  #if (!is.null(fitInfo(object,"K")))
-  #  object$Kstart <- fitInfo(object,"K")
-  #else
-
   object$Kstart <- Kstart
   
   if (!is.null(control)){
@@ -117,7 +113,7 @@ update.rcox <- function(object,
   }
   
   if (fit)# & !is.null(object$fitInfo))
-    object$fitInfo <- .fitit(object, trace=trace)
+    object$fitInfo <- fit(object, trace=trace, returnModel=FALSE)
   else
     object$fitInfo <- NULL
   return(object)

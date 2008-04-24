@@ -9,22 +9,10 @@ K2theta <- function(m, K, scale='original'){
 ## Matrices
 theta2K.rcon <- function(m, theta, scale='original'){
 
-  #md       <- getSlot(m, 'dataRep')
-  #ir       <- getSlot(m, 'intRep')  
-  
-#   md    <- m$dataRep
-#   ir    <- m$intRep
-
-#   S        <- md$S;
-#   vccTerms <- ir$vccI
-#   eccTerms <- ir$eccI
-
-  S        <- m$dataRep$S
+  p        <- nrow(m$dataRep$S)
   vccTerms <- m$intRep$vccI
   eccTerms <- m$intRep$eccI
-  
-  
-  p        <- nrow(S)
+    
   K        <- matrix(0, nrow=p, ncol=p)
   lvcc     <- length(vccTerms)
   lecc     <- length(eccTerms)
@@ -66,22 +54,10 @@ theta2K.rcon <- function(m, theta, scale='original'){
 
 theta2K.rcor <- function(m, theta, scale='original'){
 
-  #md       <- getSlot(m, 'dataRep')
-  #ir       <- getSlot(m, 'intRep')  
-
-#   md    <- m$dataRep
-#   ir    <- m$intRep
-
-#   S        <- md$S;
-#   vccTerms <- ir$vccI
-#   eccTerms <- ir$eccI
-
-  
-  S        <- m$dataRep$S
+  p        <- nrow(m$dataRep$S)
   vccTerms <- m$intRep$vccI
   eccTerms <- m$intRep$eccI
 
-  p        <- nrow(S)
   K        <- matrix(0, nrow=p, ncol=p)
   lvcc     <- length(vccTerms)
   lecc     <- length(eccTerms)
@@ -128,19 +104,6 @@ theta2K.rcor <- function(m, theta, scale='original'){
 
 K2theta.rcon <- function(m, K, scale='original'){
 
-  #md       <- getSlot(m, 'dataRep')
-  #ir       <- getSlot(m, 'intRep')  
-
-
-#   md    <- m$dataRep
-#   ir    <- m$intRep
-
-#   S        <- md$S;  
-#   vccTerms <- ir$vccI
-#   eccTerms <- ir$eccI
-
-    
-  S        <- m$dataRep$S
   vccTerms <- m$intRep$vccI
   eccTerms <- m$intRep$eccI
 
@@ -181,24 +144,10 @@ K2theta.rcon <- function(m, K, scale='original'){
 ## scaled with the diagonals
 
 K2theta.rcor <- function(m, K, scale='original'){
-
-  #md       <- getSlot(m, 'dataRep')
-  #ir       <- getSlot(m, 'intRep')  
-
-
-#   md    <- m$dataRep
-#   ir    <- m$intRep
-
-#   S        <- md$S;  
-#   vccTerms <- ir$vccI
-#   eccTerms <- ir$eccI
-
     
-  S        <- m$dataRep$S
   vccTerms <- m$intRep$vccI
   eccTerms <- m$intRep$eccI
-
-
+  
   lvcc     <- length(vccTerms)
   lecc     <- length(eccTerms)
   nparm    <- lvcc + lecc

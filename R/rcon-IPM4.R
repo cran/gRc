@@ -2,7 +2,7 @@
 ## Dette er for iterativ fitting og for user defined fitting...
 ##
 
-rconIPM <- function(object, K0, control=object$control, trace=object$trace){
+.rconIPM <- function(object, K0, control=object$control, trace=object$trace){
 
   #print(trace)
   
@@ -29,7 +29,8 @@ rconIPM <- function(object, K0, control=object$control, trace=object$trace){
 
   maxit       <- control$maxouter
   logL0       <- prevlogL <- ellK(K0,S,n-1)
-  logLeps     <- control$logLeps * abs(logL0)
+  logLeps     <- control$logLeps #* abs(logL0)
+
   logL.vec    <- rep(NA, maxit)
   itcount     <- 1
   converged   <- FALSE
@@ -39,18 +40,17 @@ rconIPM <- function(object, K0, control=object$control, trace=object$trace){
   eccfit <- control$eccfit
   vccfit <- control$vccfit
 
-##  print(eccI.at)
   while(!converged){
 
     if (vccfit){
-      Kwork <- fitIPSset(vccI.at, Kwork, S, n, control=control)$K
-      ##Kwork <- fitNR    (vccI.at, Kwork, S, n, type="vcc",control=control,trace=trace)$K
-      Kwork <- fitNR    (vccI.co, Kwork, S, n, type="vcc",control=control,trace=trace)$K
+      ##Kwork <- fitIPSset(vccI.at, Kwork, S, n, control=control)$K
+      Kwork <- fitNR2    (vccI.at, Kwork, S, n, type="vcc",control=control,trace=trace)$K
+      Kwork <- fitNR2    (vccI.co, Kwork, S, n, type="vcc",control=control,trace=trace)$K
     }
     if (eccfit){
       ##Kwork <- fitIPSedge(eccI.at, Kwork, S, n, type='ecc',control=control)$K
-      Kwork <- fitNR     (eccI.at, Kwork, S, n, type='ecc',control=control,trace=trace)$K
-      Kwork <- fitNR     (eccI.co, Kwork, S, n, type="ecc",control=control,trace=trace)$K
+      Kwork <- fitNR2     (eccI.at, Kwork, S, n, type='ecc',control=control,trace=trace)$K
+      Kwork <- fitNR2     (eccI.co, Kwork, S, n, type="ecc",control=control,trace=trace)$K
     }
     
     logL    <- ellK(Kwork,S,n-1);
@@ -65,7 +65,6 @@ rconIPM <- function(object, K0, control=object$control, trace=object$trace){
       itcount  <- itcount + 1
     }
   }
-
   
   coef <- K2theta(object,Kwork, scale='original')
   vn   <- unlist(lapply(getcc(object),names))
@@ -81,6 +80,95 @@ rconIPM <- function(object, K0, control=object$control, trace=object$trace){
   ans <- list(K=Kwork, logL=logL, coef=coef, J=J, logL.vec=logL.vec[1:itcount])
   return(ans)
 }
+
+
+
+
+
+
+
+
+
+##
+## MATRIX VERSION; reduced amount of copying
+##
+fitNR2 <- function(x, K, S, n, varIndex=1:nrow(K),type="ecc",control,trace){
+
+  f         <-  n-1;
+  itmax     <-  control$maxinner
+  eps       <-  control$deltaeps
+
+  if (length(x)){
+    ##cat("fitNR(start): type:", type, "logL:", ellK(K,S,n-1), "\n")
+
+    for (ii in 1:length(x)){
+      ## Current generator
+      gen    <- x[[ii]] ##print(gen)
+
+      ## Make gen have two columns if it does not already have so
+      if (ncol(gen)==1)
+        genmat <- cbind(gen,gen)
+      else
+        genmat <- rbind(gen,gen[,2:1])
+      
+      idx   <- sort(uniquePrim(as.numeric(gen)))
+      cidx  <- setdiffPrim(varIndex,idx);       
+      
+      ## gen2: Version of gen which matches the lower dimensional matrices used later
+      gen2           <- apply(gen,2,match,idx)
+      dim(gen2)      <- dim(gen)
+      ##storage.mode(gen2) <- "double" ## Why???
+
+      subt <- 0
+      if (length(cidx)>0)
+        subt <- K[idx,cidx,drop=FALSE] %*% solve.default(K[cidx,cidx,drop=FALSE], K[cidx,idx,drop=FALSE])
+
+      S2 <- S[idx,idx,drop=FALSE]
+      trSS2 <- .Call("trAW", gen2, S2, PACKAGE="gRc")
+
+      itcount   <-  0
+      prev.adj2 <-  0
+
+      repeat{
+        currparm  <- unique(K[genmat])
+        Sigma2    <-  solve.default(K[idx,idx]-subt)
+        trIS      <-  .Call("trAW", gen2, Sigma2, PACKAGE="gRc")
+        trISIS    <-  .Call("trAWBW", gen2, Sigma2, gen2, PACKAGE="gRc")
+        Delta2    <-  trIS - trSS2
+        adj2      <-  Delta2 /(trISIS + Delta2^2/(2) )
+        K[genmat] <-  K[genmat]+adj2
+        dadj2     <-  (adj2 - prev.adj2)
+        prev.adj2 <-  adj2
+        itcount   <-  itcount + 1
+                                        #logL <- ellK(K,S,n-1)
+                                        #dlogL <- logL-prevlogL
+                                        #print(c(itcount, logL, dlogL, abs(dadj2), min(eigen(K)$values)))
+        
+        if (trace>=4)
+          ##print(gen)
+          cat("trIS", trIS, "trISIS", trISIS, "trSS2", trSS2, "\n")
+          cat("....Modified Newton iteration", itcount,
+              "currparm:", currparm, 
+              "Delta2:", Delta2,
+              "parm change", dadj2,"\n")
+        if ( (abs(dadj2)< eps) | (itcount>=itmax) )
+          break() 
+                                        # prevlogL <- logL
+      }
+    }
+  }
+  logL <- ifelse (control[["logL"]], ellK(K,S,n-1), -9999)
+  ans  <- list(K=K, logL=logL)
+  return(ans)
+}
+
+
+
+
+
+
+
+
 
 
 ## MATRIX VERSION
@@ -100,8 +188,8 @@ fitNR <- function(x, K, S, n, varIndex=1:nrow(K),type="ecc",control,trace){
       else
         clmat <- rbind(cl,cl[,2:1])
 
-      idx   <- sort(unique(as.numeric(cl)))
-      cidx  <- setdiff(varIndex,idx);       
+      idx   <- sort(uniquePrim(as.numeric(cl)))
+      cidx  <- setdiffPrim(varIndex,idx);       
       
       ## cl2: Version of cl which matches the lower dimensional matrices used later
       cl2 <- apply(cl,2,match,idx)
@@ -110,7 +198,7 @@ fitNR <- function(x, K, S, n, varIndex=1:nrow(K),type="ecc",control,trace){
       #print(cl2)
       
       if (length(cidx)>0)
-        subt <- K[idx,cidx,drop=FALSE]%*% solve(K[cidx,cidx,drop=FALSE], K[cidx,idx,drop=FALSE])
+        subt <- K[idx,cidx,drop=FALSE]%*% solve.default(K[cidx,cidx,drop=FALSE], K[cidx,idx,drop=FALSE])
         ##subt <- K[idx,cidx,drop=F]%*%cholSolve(K[cidx,cidx,drop=F])%*%K[cidx,idx,drop=F]
       else
         subt <- 0
@@ -148,10 +236,12 @@ modNewt <- function(K, S, n, idx, cl, cl2, clmat, subt, type, control,trace){
 #  prevlogL <- ellK(K,S,n-1)
   repeat{
     ##Sigma2    <-  cholSolve(K[idx,idx]-subt)
-    Sigma2    <-  solve(K[idx,idx]-subt)
+    Sigma2    <-  solve.default(K[idx,idx]-subt)
                                         #print(cl2)
     trIS      <-  trAW(cl2,Sigma2)
-    trISIS    <-  trAWBW(cl2, Sigma2, cl2)
+    ##trISIS    <-  trAWBW(cl2, Sigma2, cl2)
+
+    trISIS    <-  .Call("trAWBW", cl2, Sigma2, cl2, PACKAGE="gRc")
     
     Delta2    <-  trIS - trSS2
     #adj2     <-  Delta2 /(trISIS + 0.5*f*Delta2^2 )
@@ -163,9 +253,9 @@ modNewt <- function(K, S, n, idx, cl, cl2, clmat, subt, type, control,trace){
     dadj2     <- (adj2 - prev.adj2)
     prev.adj2 <- adj2
     itcount   <- itcount + 1
-    ## logL <- ellK(K,S,n-1)
-    ## dlogL <- logL-prevlogL
-    ## print(c(itcount, logL, dlogL, abs(dadj2), min(eigen(K)$values)), digits=15)
+    #logL <- ellK(K,S,n-1)
+    #dlogL <- logL-prevlogL
+    #print(c(itcount, logL, dlogL, abs(dadj2), min(eigen(K)$values)))
 
     if (trace>=4)
     cat("....Modified Newton iteration", itcount, "parm change", dadj2,"\n")
@@ -179,59 +269,6 @@ modNewt <- function(K, S, n, idx, cl, cl2, clmat, subt, type, control,trace){
 
 
 
-
-
-# modNewt <- function(K, S, n, idx, cl, cl2, clmat, subt, type, control,trace){
-#   f         <-  n-1;
-#   itcount   <-  0
-#   itmax     <- 25
-#   eps       <-  0.01
-#   prev.adj2 <-  0
-#   trSS2     <-  trAW(cl, S)
-
-#   #prevlogL <- ellK(K,S,n-1)
-#   repeat{
-#     ##Sigma2    <-  cholSolve(K[idx,idx]-subt)
-#     Sigma2    <-  solve(K[idx,idx]-subt)
-#     trIS      <-  trAW(cl2,Sigma2)
-#     trISIS    <-  trAWBW(cl2, Sigma2, cl2)
-    
-#     Delta2    <-  trIS - trSS2
-#     #adj2     <-  Delta2 /(trISIS + 0.5*f*Delta2^2 )
-#     ##adj2     <-  Delta2 /(trISIS + 2*f*Delta2^2 )
-#     adj2      <-  Delta2 /(trISIS + 0.5*Delta2^2 )
-    
-#     K[clmat]  <- K[clmat]+adj2
-#     dadj2     <- (adj2 - prev.adj2)
-#     prev.adj2 <- adj2
-#     itcount   <- itcount + 1
-#     logL <- ellK(K,S,n-1)
-#     #dlogL <- logL-prevlogL
-#     ## print(c(itcount, logL, dlogL, abs(dadj2), min(eigen(K)$values)), digits=15)
-#     if (trace>=4)
-#     cat("....Modified Newton iteration", itcount, "parm change", dadj2,"\n")
-#     if ( (abs(dadj2)< eps) | (itcount>=itmax) )
-#       break()
-
-#    # prevlogL <- logL
-#   }
-#   return(K)
-# }
-
-
-#     print(c(trISold,trISISold))
-#     Kinv <- solve(K)
-#     trIS      <-  trAW(cl,Kinv)
-#     trISIS    <-  trAWBW(cl, Kinv, cl)
-#     print(c(trIS,trISIS))
-
-#     if (abs(trISold-trIS)>0.01){
-#       print(idx)
-#       print(cl)
-#       print(cl2)
-      
-#       stop()
-#     }
 
 
 
@@ -253,7 +290,7 @@ fitIPSedge <- function(x, K, S, n, varIndex=1:nrow(K),type,control=NULL){
       
       if (length(notC)>0)
         ##subt <- K[C,notC,drop=FALSE] %*% solve(K[notC,notC,drop=FALSE]) %*% K[notC,C,drop=FALSE]
-        subt <- K[C,notC,drop=FALSE] %*% solve(K[notC,notC,drop=FALSE],  K[notC,C,drop=FALSE])
+        subt <- K[C,notC,drop=FALSE] %*% solve.default(K[notC,notC,drop=FALSE],  K[notC,C,drop=FALSE])
       else
         subt <- 0
       
@@ -298,7 +335,7 @@ fitIPSedge <- function(x, K, S, n, varIndex=1:nrow(K),type,control=NULL){
       
       if (length(notC)>0)
         ##subt <- K[C,notC,drop=FALSE]%*%cholSolve(K[notC,notC,drop=FALSE])%*%K[notC,C,drop=FALSE]
-        subt <- K[C,notC,drop=FALSE]%*%solve(K[notC,notC,drop=FALSE])%*%K[notC,C,drop=FALSE]
+        subt <- K[C,notC,drop=FALSE]%*%solve.default(K[notC,notC,drop=FALSE])%*%K[notC,C,drop=FALSE]
       else
         subt <- 0
 
@@ -333,14 +370,15 @@ fitIPSset <- function(x,K,S,n,varIndex=1:nrow(K), control){
     x.complements <- lapply(x, my.complement)
     
     if(length(x.complements[[1]])==0){
-      return(list(K=solve(S)))
+      return(list(K=solve.default(S)))
     }
     
     for(j in 1:length(x)){
       C     <- x[[j]]
       notC  <- x.complements[[j]]
       K[C,C] <- solve( S[C,C,drop=FALSE] ) +
-        K[C,notC,drop=FALSE]%*%solve(K[notC,notC,drop=FALSE])%*%K[notC,C,drop=FALSE]
+        K[C,notC,drop=FALSE] %*% solve.default(K[notC,notC,drop=FALSE], K[notC,C,drop=FALSE])
+      ##K[C,notC,drop=FALSE] %*% solve(K[notC,notC,drop=FALSE]) %*% K[notC,C,drop=FALSE]
     }
   }
   
@@ -405,4 +443,111 @@ fitIPSset <- function(x,K,S,n,varIndex=1:nrow(K), control){
 #   #cat("fitNR: type:", type, "logL:", logL, "\n")
 #   ans <- list(K=K, logL=logL)
 #   return(ans)
+# }
+
+
+
+
+# modNewt <- function(K, S, n, idx, cl, cl2, clmat, subt, type, control,trace){
+#   f         <-  n-1;
+#   itcount   <-  0
+#   itmax     <- 25
+#   eps       <-  0.01
+#   prev.adj2 <-  0
+#   trSS2     <-  trAW(cl, S)
+
+#   #prevlogL <- ellK(K,S,n-1)
+#   repeat{
+#     ##Sigma2    <-  cholSolve(K[idx,idx]-subt)
+#     Sigma2    <-  solve(K[idx,idx]-subt)
+#     trIS      <-  trAW(cl2,Sigma2)
+#     trISIS    <-  trAWBW(cl2, Sigma2, cl2)
+    
+#     Delta2    <-  trIS - trSS2
+#     #adj2     <-  Delta2 /(trISIS + 0.5*f*Delta2^2 )
+#     ##adj2     <-  Delta2 /(trISIS + 2*f*Delta2^2 )
+#     adj2      <-  Delta2 /(trISIS + 0.5*Delta2^2 )
+    
+#     K[clmat]  <- K[clmat]+adj2
+#     dadj2     <- (adj2 - prev.adj2)
+#     prev.adj2 <- adj2
+#     itcount   <- itcount + 1
+#     logL <- ellK(K,S,n-1)
+#     #dlogL <- logL-prevlogL
+#     ## print(c(itcount, logL, dlogL, abs(dadj2), min(eigen(K)$values)), digits=15)
+#     if (trace>=4)
+#     cat("....Modified Newton iteration", itcount, "parm change", dadj2,"\n")
+#     if ( (abs(dadj2)< eps) | (itcount>=itmax) )
+#       break()
+
+#    # prevlogL <- logL
+#   }
+#   return(K)
+# }
+
+
+#     print(c(trISold,trISISold))
+#     Kinv <- solve(K)
+#     trIS      <-  trAW(cl,Kinv)
+#     trISIS    <-  trAWBW(cl, Kinv, cl)
+#     print(c(trIS,trISIS))
+
+#     if (abs(trISold-trIS)>0.01){
+#       print(idx)
+#       print(cl)
+#       print(cl2)
+      
+#       stop()
+#     }
+
+
+
+# ## MATRIX VERSION
+# modNewt2 <- function(K, S, n, idx, cl, cl2, clmat, subt, type, control,trace){
+#   f         <-  n-1;
+#   itcount   <-  0
+#   itmax     <-  control$maxinner
+#   eps       <-  control$deltaeps
+#   prev.adj2 <-  0
+#   ##print(cl)
+#   trSS2     <-  trAW(cl, S)
+
+# #   print("modNEWT")
+# #   print(cl);
+# #   print(cl2)
+# #   print(clmat)
+# #   print(subt)
+  
+# #  prevlogL <- ellK(K,S,n-1)
+#   repeat{
+#     ##Sigma2    <-  cholSolve(K[idx,idx]-subt)
+#     Sigma2    <-  solve.default(K[idx,idx]-subt)
+#                                         #print(cl2)
+#     trIS      <-  trAW(cl2,Sigma2)
+#     ##trISIS    <-  trAWBW(cl2, Sigma2, cl2)
+
+#     trISIS    <-  .Call("trAWBW", cl2, Sigma2, cl2, PACKAGE="gRc")
+    
+#     Delta2    <-  trIS - trSS2
+#     #adj2     <-  Delta2 /(trISIS + 0.5*f*Delta2^2 )
+#     ##adj2     <-  Delta2 /(trISIS + 2*f*Delta2^2 )
+#     adj2      <-  Delta2 /(trISIS + 0.5*Delta2^2 )
+
+
+#     K[clmat]  <- K[clmat]+adj2
+#     dadj2     <- (adj2 - prev.adj2)
+#     prev.adj2 <- adj2
+#     itcount   <- itcount + 1
+#     #logL <- ellK(K,S,n-1)
+#     #dlogL <- logL-prevlogL
+#     #print(c(itcount, logL, dlogL, abs(dadj2), min(eigen(K)$values)))
+
+#     if (trace>=4)
+#     cat("....Modified Newton iteration", itcount, "parm change", dadj2,"\n")
+#     if ( (abs(dadj2)< eps) | (itcount>=itmax) )
+#       break()
+
+#    # prevlogL <- logL
+#   }
+#   return(K)
 # }

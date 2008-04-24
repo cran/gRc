@@ -87,29 +87,6 @@ print.summary.rcox <- function(x, ...){
   return(invisible(x))
 }
 
-
-# vcov.rcox <- function(object, ...){
-#   f1     <- fitInfo(object)
-#   method <- f1$method
-#   switch(method,
-#          "matching"={
-#            if (!is.null(f1$vcov))
-#              f1$vcov
-#            else {
-#              object$control$vcov<-"boot"
-#              .fitit(object)$vcov
-#            }
-#          },
-#          "ipm"={
-#            f1$vcov
-#          },
-#          "scoring" ={
-#            solve(f1$J)
-#          }
-#          )
-# }
-
-
 vcov.rcox <- function(object, ...){
   f1     <- fitInfo(object)
   solve(f1$J)

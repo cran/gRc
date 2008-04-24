@@ -27,17 +27,13 @@ findKinModel.rcox <- function(m, KS, type="rcon", regularize=TRUE){
          'rcon'={
            KS2 <- KS;
            KS2[,] <- 0; diag(KS2) <- diag(KS)
-           #print(KS)
-           ##print("RCON")
            VCC <- intRep(m,"vccI")
            ECC <- intRep(m,"eccI")
 
            for (i in seq(along=ECC)){
              x      <- ECC[[i]]
-             #if (nrow(x)>1){             
-               x2    <- x[,2:1,drop=FALSE]
-               KS2[x] <- KS2[x2] <- mean(KS[x])
-             #}
+             x2    <- x[,2:1,drop=FALSE]
+             KS2[x] <- KS2[x2] <- mean(KS[x])
            }
            
            for (i in seq(along=VCC)){
@@ -47,7 +43,6 @@ findKinModel.rcox <- function(m, KS, type="rcon", regularize=TRUE){
                diag(KS2)[x] <- mean(diag(KS)[x])
              }
            }
-           #print(KS2)
            
            if (regularize && (min(eigen(KS2)$values) < 0)){             
              KKmod <- regularizeK(KS2)
@@ -67,7 +62,7 @@ findKinModel.rcox <- function(m, KS, type="rcon", regularize=TRUE){
 regularizeK <- function(K){
   Kdiag <- abs(diag(diag(K)))           
   Krest <- K-Kdiag
-  alpha <- 0.95
+  alpha <- 0.9
   repeat{
     Kmod  <- Kdiag + alpha*Krest    
     if (min(eigen(Kmod)$values) > 0){
@@ -81,94 +76,3 @@ regularizeK <- function(K){
 }
 
 
-# regularizeK2 <- function(K){
-#   Kdiag <- abs(diag(diag(K)))           
-#   Krest <- K-Kdiag
-#   alpha <- 1.1
-#   repeat{
-#     Kmod  <- alpha*Kdiag + Krest 
-# #    print(alpha)
-# #    print(eigen(Kmod)$values)
-#     alpha <- alpha+0.1
-#     if (min(eigen(Kmod)$values) > 0){
-#       Kmod <- alpha * Kdiag + Krest ## Be on the safe side...
-#       ##cat("The end", alpha,"\n")
-#       break()
-#     }
-#   }
-#   Kmod
-# }
-
-
-
-
-
-
-
-
-
-
-
-
-# findKinModel.rcox <- function(m, KS, type="rcon", regularize=TRUE){
-#   if (is.null(KS))
-#     return(NULL)
-  
-#   switch(type,
-#          'rcor'={
-#            C <- findKinModel(m,cov2cor(KS),   type='rcon')
-#            A <- findKinModel(m,diag(diag(KS)),type='rcon')
-#            a <- sqrt(diag(A))
-#            #A <- diag(sqrt(diag(A)))
-#            KKmod <- a * t(a*C) ## Short for KKmod <- A%*%C%*%A
-#            KKmod
-#          },
-         
-#          'rcon'={
-#            KK  <- matrix(0, ncol=ncol(KS), nrow=nrow(KS))
-#            dimnames(KK) <- dimnames(KS)##print(dimnames(dataRep(m,"S")))
-#            VCC <- intRep(m,"vccI")
-#            ECC <- intRep(m,"eccI")
-           
-#            for (i in seq(along=ECC)){
-#              x      <- ECC[[i]]
-#              id     <- matrix(unlist(x),ncol=2,byrow=TRUE)
-#              KK[id] <- mean(KS[id])
-#            }
-#            KK <- KK + t(KK)
-#            for (i in seq(along=VCC)){
-#              x           <-unlist(VCC[[i]])
-#              diag(KK)[x] <- mean(diag(KS)[x])
-#            }
-           
-#            if (regularize && (min(eigen(KK)$values) < 0)){             
-#              KKmod <- regularizeK(KK)
-#            } else {
-#              KKmod <- KK
-#            }
-#          }
-#        )
-#   return(KKmod)
-# }
-
-
-
-
-
-
-
-
-##findKinModelPrimitive <- function(m,KS,type='rcon'){
-#              KKdiag <- diag(diag(KK))           
-#              ## Regularize K
-#              KKrest <- KK-KKdiag
-#              alpha  <- 0.95
-#              repeat{
-#                ##print(alpha)
-#                KKmod <- KKdiag + alpha*KKrest
-#                alpha <- alpha-0.05
-#                if (min(eigen(KKmod)$values) > 0){
-#                  KKmod <- KKdiag + alpha*KKrest ## Be on the safe side...
-#                  break()
-#                }
-#              }

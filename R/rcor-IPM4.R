@@ -10,11 +10,13 @@
 ##    C using IPM only on off-diagonals of C
 ##
 
+
 rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
-  S   <- dataRep(object, "S")
-  n   <- dataRep(object, "n")
-  VCC <- intRep(object,"vccI")
-  V   <- NULL
+  
+  S     <- object$dataRep$S
+  n     <- object$dataRep$n
+  VCC   <- object$intRep$vccI
+  glist <- object$intRep$eccI
 
   logL0       <- prevlogL <- ellK(K0,S,n-1)
   
@@ -24,24 +26,30 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
   logL.vec    <- rep(NA, maxit)
   converged   <- FALSE
 
-  ## Temporary model object with new controls
-  ctrl        <- object$control
-  ctrl$vccfit <- FALSE
-  ctrl$vcov   <- NULL
-  o2          <- object
-  o2$control  <- ctrl
+  ctrl      <- object$control
+  deltaeps  = ctrl$deltaeps
+  maxouter  = ctrl$maxouter
+  maxinner  = ctrl$maxinner
+  nobs      = n
 
-  ##C.curr    <- diag(1, nrow(S));     ## Initial C
-  C.curr    <- cov2cor(K0)             ##print(C.curr)
-  A         <- refitA(S,C.curr,VCC); ## First A estimate
+  logLINT      = 0
+  convergedINT = 1
 
+  C.curr    <- cov2cor(K0)             ## print(C.curr)
+  A         <- refitA(S, C.curr, VCC);   ## First A estimate
+  
   itcount <- 1
   while(!converged){
     Q.curr        <- A * t((A*S)) ## Short for diag(A) %*% S %*% diag(A)
-    o2$dataRep$S  <- Q.curr
-
-    C.curr  <- rconIPM(o2,K0=C.curr, control=o2$control, trace=trace-1)$K
+    
+    C.curr<-.Call("rconipm", S=Q.curr, nobs=nobs-1, C.curr, Glist=glist, 
+                  maxouter=maxouter, maxinner=maxinner, 
+                  logL=logLINT, logLeps=logLeps, deltaeps=deltaeps,
+                  converged=convergedINT, trace=0,
+                  PACKAGE="gRc")
+    
     K.curr  <- A * t((A*C.curr)) ## Short for diag(A) %*% C.curr %*% diag(A)
+
     A       <- refitA(S, C.curr, VCC, Astart=A)
     logL    <- ellK(K.curr,S,n-1);
     dlogL   <- logL - prevlogL
@@ -50,7 +58,7 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
       cat("...rcorIPM iteration", itcount, "logL:", logL, "dlogL:", dlogL, "\n")
 
     logL.vec[itcount]  <- logL
-    if ((logL-prevlogL) < logLeps || itcount>=maxit)
+    if (dlogL < logLeps || itcount>=maxit)
       converged <- TRUE
     else {
       prevlogL <- logL;
@@ -74,44 +82,151 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
   return(ans)
 }
 
-refitA <- function(S,K,NSi,Astart=NULL,itmax=100){
 
-  cstart <- Astart
+refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
+  
   d <- nrow(S)
-  if (is.null(cstart))
-    cstart <- rep(1,d)
-  cprev <- cstart
+  if (is.null(Astart))
+    Astart <- rep(1,d)
+  Aprev <- Astart
   iii   <- 0
-
-  all <- unique(unlist(NSi))
+  
+  all <- unique(unlist(vccI))
   all <- all[order(all)]
+
+  gset <- vccI
+  cset <- vccI
+
+  for (i in 1:length(vccI)){
+    gset[[i]] <- as.numeric(vccI[[i]])
+    cset[[i]] <- setdiffPrim(all, gset[[i]])
+  }
+
   repeat{
     iii <- iii + 1
-    for (i in 1:length(NSi)){
-      cns   <- as.numeric(NSi[[i]])
-
-      compl <- setdiff(all,cns)
+    for (i in 1:length(vccI)){
+      cns   <- gset[[i]]
+      compl <- cset[[i]]
       Ai <- sum(S[cns,cns] * K[cns,cns])
-      Bi <- sum(S[compl,cns] * K[compl,cns] *cstart[compl])
+      Bi <- sum(S[compl,cns] * K[compl,cns] *Astart[compl])
       Ci <- length(cns)
       Di <- (Bi^2 + 4*Ai*Ci)
       xi <- (-Bi + sqrt(Di))/(2*Ai)
-      cstart[cns] <- xi
+      Astart[cns] <- xi
       ##cat("Ai:", Ai, "Bi:", Bi, "Ci:", Ci, "\n")
     }
-    if ((sum( (cprev-cstart)^2) < 1e-9) | iii>=itmax){
+    if ((max( (Aprev-Astart)^2) < 1e-4) | iii>=itmax){
       ##cat("Iterations:",iii,"\n\n")
       break
-    }
-    cprev <- cstart
+    }    
+    Aprev <- Astart
   }
-  attr(cstart,"iterations") <- iii
-  return(cstart)
+  attr(Astart,"iterations") <- iii
+  return(Astart)
 }
 
 
 
+# ## OLD ONE
+# .rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
+#   S   <- dataRep(object, "S")
+#   n   <- dataRep(object, "n")
+#   VCC <- intRep(object,"vccI")
+#   V   <- NULL
 
+#   logL0       <- prevlogL <- ellK(K0,S,n-1)
+  
+#   maxit       <- control$maxouter
+#   logLeps     <- control$logLeps * abs(logL0)
+
+#   logL.vec    <- rep(NA, maxit)
+#   converged   <- FALSE
+
+#   ## Temporary model object with new controls
+#   ctrl        <- object$control
+#   ctrl$vccfit <- FALSE
+#   ctrl$vcov   <- NULL
+#   o2          <- object
+#   o2$control  <- ctrl
+
+#   ##C.curr    <- diag(1, nrow(S));     ## Initial C
+#   C.curr    <- cov2cor(K0)             ##print(C.curr)
+#   A         <- refitA(S,C.curr,VCC); ## First A estimate
+
+#   itcount <- 1
+#   while(!converged){
+#     Q.curr        <- A * t((A*S)) ## Short for diag(A) %*% S %*% diag(A)
+#     o2$dataRep$S  <- Q.curr
+
+#     C.curr  <- rconIPM(o2,K0=C.curr, control=o2$control, trace=trace-1)$K
+#     K.curr  <- A * t((A*C.curr)) ## Short for diag(A) %*% C.curr %*% diag(A)
+#     A       <- refitA(S, C.curr, VCC, Astart=A)
+#     logL    <- ellK(K.curr,S,n-1);
+#     dlogL   <- logL - prevlogL
+    
+#     if (trace>=3)
+#       cat("...rcorIPM iteration", itcount, "logL:", logL, "dlogL:", dlogL, "\n")
+
+#     logL.vec[itcount]  <- logL
+#     if ((logL-prevlogL) < logLeps || itcount>=maxit)
+#       converged <- TRUE
+#     else {
+#       prevlogL <- logL;
+#       itcount  <- itcount + 1
+#     }
+#   }
+
+#   coef <- K2theta(object,K.curr, scale='original')
+#   vn   <- unlist(lapply(getcc(object),names))
+#   names(coef) <- vn
+
+#   if (!is.null(control$vcov)){
+#     J  <- getScore(object,K=K.curr)$J
+#     dimnames(J) <- list(vn, vn)
+#   } else {
+#     J <- NULL
+#   }
+   
+#   dimnames(K.curr) <- dimnames(S)
+#   ans <- list(K=K.curr, logL=logL, coef=coef, J=J, logL.vec=logL.vec[1:itcount])
+#   return(ans)
+# }
+
+
+# refitA <- function(S, K, NSi, Astart=NULL, itmax=100){
+
+#   cstart <- Astart
+#   d <- nrow(S)
+#   if (is.null(cstart))
+#     cstart <- rep(1,d)
+#   cprev <- cstart
+#   iii   <- 0
+
+#   all <- unique(unlist(NSi))
+#   all <- all[order(all)]
+#   repeat{
+#     iii <- iii + 1
+#     for (i in 1:length(NSi)){
+#       cns   <- as.numeric(NSi[[i]])
+
+#       compl <- setdiff(all,cns)
+#       Ai <- sum(S[cns,cns] * K[cns,cns])
+#       Bi <- sum(S[compl,cns] * K[compl,cns] *cstart[compl])
+#       Ci <- length(cns)
+#       Di <- (Bi^2 + 4*Ai*Ci)
+#       xi <- (-Bi + sqrt(Di))/(2*Ai)
+#       cstart[cns] <- xi
+#       ##cat("Ai:", Ai, "Bi:", Bi, "Ci:", Ci, "\n")
+#     }
+#     if ((sum( (cprev-cstart)^2) < 1e-9) | iii>=itmax){
+#       ##cat("Iterations:",iii,"\n\n")
+#       break
+#     }
+#     cprev <- cstart
+#   }
+#   attr(cstart,"iterations") <- iii
+#   return(cstart)
+# }
 
 
 # rcorFitIterative <- function(m,control=rcox.control()){

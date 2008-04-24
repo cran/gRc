@@ -23,19 +23,16 @@
 
 # Stop doing lineserach when steps have been halved more than 3 times...
 
-scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
-                         control=m$control,
-                         maxit=control$maxouter,
-                         trace=m$trace){
-
-
+##scoring.rcox <- function(m, K0,
+                         
+scoring <- function(m, K0, 
+                    control = m$control,
+                    maxit   = control$maxouter,
+                    trace   = m$trace){
   
   tstart <- proc.time()
   if (trace>=2)
-    cat("..Fitting model with scoring",maxit,"\n")
-  
-  ##f       <- dataRep(m, 'n') - 1
-  ##S       <- dataRep(m,'S')
+    cat("..Fitting model with scoring\n")
 
   f       <- m$dataRep$n - 1
   S       <- m$dataRep$S
@@ -61,11 +58,10 @@ scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
 
   repeat {
     itcount <- itcount + 1
-    x       <- getScore(m, curr.K, scale='free')
+    xxx       <- getScore(m, curr.K, scale='free')
 
-    Sc      <- x$score
-    #J       <- x$J
-    DISC    <- try(qr.solve(x$J + (Sc%*%t(Sc)/fscale), Sc))
+    Sc      <- xxx$score
+    DISC    <- try(solve.default(xxx$J + (Sc%*%t(Sc)/fscale), Sc))
     if (class(DISC)=='try-error'){
       cat("Error in Fisher scoring, please report...\n")
     }
@@ -84,7 +80,8 @@ scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
         if (stephalfcount<10){
           stephalfcount <- stephalfcount + 1
           stepsize      <- stepsize / 2
-          if(trace>=3) cat ("...logL:", new.logL, "outer it:",itcount,"New stepsize:", stepsize, "\n")
+          if(trace>=3) cat ("...logL:", new.logL, "outer it:",itcount,
+               "New stepsize:", stepsize, "\n")
         } else {
           Good <- FALSE
           break()
@@ -116,7 +113,7 @@ scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
   if (trace>=3) cat("...Scoring iterations:", itcount, "\n")
   logL.vec <- logL.vec[!is.na(logL.vec)]
 
-  vn <- unlist(lapply(getcc(m),names))
+  vn <- unlistPrim(lapply(getcc(m),names))
   names(new.theta) <- vn
 
   ## Back to original scale
@@ -134,22 +131,3 @@ scoring.rcox <- function(m, K0, ## =fitInfo(m, "K"),
 }
 
 
-
-
-      ##if (is.na(new.logL) | (diff.logL < 0 & stephalfcount < 4)){
-     #  if (stephalfcount < 4 & (is.na(new.logL) || (!is.na(new.logL) & diff.logL < 0)  )){
-#         stephalfcount <- stephalfcount + 1
-#         stepsize <- stepsize / 2
-#         if(trace>=4) cat ("....logL:", new.logL, "New stepsize:", stepsize, "\n")
-#       } else {
-#         break()
-#       }
-
-
-
-
-#   print("J"); print(J)
-  
-#   if (!is.null(control$vcov)){
-#     V <- calculateVCOV(m, K=new.K, vcov=control$vcov, nboot=control$nboot)
-#   }

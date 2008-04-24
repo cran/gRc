@@ -1,0 +1,8 @@
+
+	* rconipm.c should do ips step on atomic vcc's
+	
+	* clevertrace.c can be optimized by not doing unnecessary multiplications
+	
+	* K2theta and theta2K can be implemented directly in C.
+	
+	

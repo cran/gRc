@@ -1,7 +1,7 @@
 
 rcox <- function(gm=NULL, vcc=NULL, ecc=NULL, 
                  type   = c('rcon','rcor'),
-                 method = c("scoring","ipm", "matching", "user"),
+                 method = c("scoring","ipm", "matching", "hybrid1"),
                  fit=TRUE, data=NULL, S=NULL, n=NULL, Kstart=NULL,
                  control=list(),
                  details=1,
@@ -21,6 +21,7 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
               logL     = FALSE,
               logLeps  = 1e-6,
               deltaeps = 1e-2,
+              hybrid1switch = 30,
               short    = FALSE
               )
 
@@ -72,7 +73,7 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
 
   
   if (fit){
-    ans$fitInfo <- .fitit(ans, method=method, trace=trace)
+    ans$fitInfo <- fit(ans, method=method, trace=trace, returnModel=FALSE)
   }
   return(ans)
 }
@@ -109,18 +110,21 @@ print.rcox <- function(x, ...){
   vccI <- names2indices(vccN, dataNames)
   eccI <- names2indices(eccN, dataNames)
 
-  eccI <- lapply(eccI, function(e) {names(e) <- NULL; e})
-  vccI <- lapply(vccI, function(e) {names(e) <- NULL; e}) 
+  vccI <- lapply(vccI,
+                 function(e) {
+                   names(e) <- NULL;
+                   e <- do.call("rbind", e)
+                   #storage.mode(e) <- "double"
+                   e
+                 })
 
-  eccI <- lapply(eccI, function(x1){ do.call("rbind",x1)})
-  vccI <- lapply(vccI, function(x2){ do.call("rbind",x2)})
-
-  ## To facilitate call to C-functions
-  vccI <- lapply(vccI,"storage.mode<-", "double")
-  eccI <- lapply(eccI,"storage.mode<-", "double")
-
-  ##eccI <<- eccI
-  ##vccI <<- vccI
+  eccI <- lapply(eccI,
+                 function(e) {
+                   names(e) <- NULL;
+                   e <- do.call("rbind", e)
+                   #storage.mode(e) <- "double"
+                   e
+                 })
   
   if (trace>=6){
     cat("......Internal representation:\n")
@@ -142,8 +146,8 @@ print.rcox <- function(x, ...){
   
   ## Get vertices/edges from gm-spec
   ##
-  idx         <- sapply(gmN, length)
-  gmNvertices <- lapply(unique(unlist(gmN)),list) ## lapply(gmN[idx==1], list)
+  idx         <- unlistPrim(lapply(gmN, length))
+  gmNvertices <- lapply(uniquePrim(unlistPrim(gmN)),list) ## lapply(gmN[idx==1], list)
   x           <- unlist(lapply(gmN[idx>1], names2pairs),recursive=FALSE)
   gmNedges    <- lapply(x, list)
 
@@ -152,9 +156,9 @@ print.rcox <- function(x, ...){
   ## Make standard representation
   ##
   eccN <- c(eccN, gmNedges)
-  uuu  <- unlist(eccN)  
+  uuu  <- unlistPrim(eccN)  
   uuu  <- lapply(uuu, as.list)
-  vccN <- unique(c(uuu, vccN, gmNvertices))
+  vccN <- uniquePrim(c(uuu, vccN, gmNvertices))
 
   vccI <- names2indices(vccN, dataNames)
   eccI <- names2indices(eccN, dataNames)
@@ -166,7 +170,7 @@ print.rcox <- function(x, ...){
   eccN <- eccN[ri]
   
   ##cat("4:", proc.time()-t0,"\n")
-  varNames <- unique(unlist(c(vccN,eccN)))
+  varNames <- uniquePrim(unlistPrim(c(vccN,eccN)))
   
   ans <- list(vccN=vccN, eccN=eccN, varNames=varNames)
   return(ans)
@@ -212,12 +216,7 @@ print.rcox <- function(x, ...){
 
   nodes     <- dataNames[sort(match(nodes, dataNames))]
   
-  S <-  S[nodes, nodes]
-#   if (type=="rcor"){
-#     ##cat("Rescaling S\n")
-#     S <- cov2cor(S)
-#   } 
-  
+  S   <-  S[nodes, nodes]  
   ans <- list(S=S, n=n, dataNames=rownames(S), nodes=nodes)
 
   return(ans)

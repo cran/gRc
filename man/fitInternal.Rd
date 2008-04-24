@@ -18,6 +18,7 @@
 
 \alias{fitIPSedge}
 \alias{fitIPSset}
+\alias{fitNR2}
 \alias{fitNR}
 \alias{modNewt}
 \alias{refitA}

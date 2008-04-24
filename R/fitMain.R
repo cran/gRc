@@ -1,47 +1,20 @@
-# fit <- function(object,
-#                 method  = object$method,
-#                 control = object$control,
-#                 details = object$details,
-#                 trace   = object$trace,
-#                 returnModel=TRUE
-#                 ){
-#   UseMethod("fit")
-# }
 
 fit.rcox <- function(m,
+                     Kstart  = m$Kstart,
                      method  = m$method,
                      control = m$control,
                      details = m$details,
                      trace   = m$trace,
                      returnModel=TRUE,...){
-
-  ans        <- .fitit(m, method=method, control=control,trace=trace)
-
-  if (returnModel){
-    m$Kstart   <- ans$Kstart
-    ans$Kstart      <- NULL    
-    m$fitInfo  <- ans
-    m$method   <- method
-    return(m)
-  } else {
-    return(ans)
-  }
-}
-
-
-.fitit <-  function(m,
-                    method  = m$method,
-                    control = m$control,
-                    details = m$details,
-                    trace   = m$trace){
-  if (trace>=1) cat(".Fitting method: ", method, "\n")
-  tstart <- proc.time()
-
-  if (is.null(m$Kstart))
+  
+  if (is.null(Kstart)){
+    ## cat("Finding Kstart\n")
     Kstart    <- matching(m, trace=trace)$K
-  else
-    Kstart   <- findKinModel(m, KS=m$Kstart,type=m$type, regularize=TRUE)
+  }
+                                        #  else
+#    Kstart    <- findKinModel(m, KS=m$Kstart,type=m$type, regularize=TRUE)
 
+  tstart <- proc.time()
   ans <- switch(method,
                 "matching"=
                 {
@@ -52,30 +25,58 @@ fit.rcox <- function(m,
                 {
                   switch(method,
                          "scoring"={
+                                        #print(Kstart)
                            scoring(m, K0=Kstart, control=control, trace=trace)
                          },
                          "ipm"={
+                                        #print(Kstart)
                            ipm(m, K0=Kstart, control=control, trace=trace)         
                          })
                 },
-                "user"={
+                "hybrid1"={
                   m2 <- m
                   ctrl          <- m$control
-                  ctrl$maxouter <- 5
+                  ctrl$maxouter <- ctrl$hybrid1switch
                   ctrl$vcov     <- NULL
                   KK  <-ipm(m2, K0=Kstart, control=ctrl, trace=trace)$K
                   scoring(m, K0=KK, control=control, trace=trace)
                 }
-         )
+                )
   ans$method <- method
-  ans$Kstart <- Kstart ## Hmmmm
+  ans$Kstart <- Kstart 
   ans$time   <- (proc.time()-tstart)[3]
-  return(ans)
+  
+  if (returnModel){
+    m$Kstart   <- ans$Kstart
+    ans$Kstart <- NULL    
+    m$fitInfo  <- ans
+    m$method   <- method
+    return(m)
+  } else {
+    return(ans)
+  }
 }
 
 matching      <- function(m, control=m$control, trace=m$trace){
-  UseMethod("matching")
+  if (inherits(m,"rcon"))
+    rconScoreMatch(m, control=control, trace=trace)
+  else
+    rcorScoreMatch(m, control=control, trace=trace)
+  ##UseMethod("matching")
 }
+
+ipm <- function(m, K0, control=m$control, trace=m$trace){
+  if (inherits(m,"rcon"))
+    rconIPM(m, K0, control, trace)
+  else
+    rcorIPM(m, K0, control, trace)
+  ##UseMethod("ipm")
+}
+
+
+#scoring <- function(m, K0, control=m$control, maxit=control$maxouter,trace=m$trace) {
+#  UseMethod("scoring")
+#}
 
 matching.rcon <- function(m, control=m$control, trace=m$trace){
   rconScoreMatch(m, control=control, trace=trace)
@@ -85,21 +86,19 @@ matching.rcor <- function(m, control=m$control, trace=m$trace){
   rcorScoreMatch(m, control=control, trace=trace)
 }
 
-ipm <- function(m, K0, control=m$control, trace=m$trace){
-  UseMethod("ipm")
-}
-
 ipm.rcon <- function(m, K0, control=m$control, trace=m$trace){
-  ##print("ipm.rcon"); print(trace)
   rconIPM(m, K0, control, trace)
 }
 
 ipm.rcor <- function(m, K0, control=m$control, trace=m$trace){
-  #print("ipm.rcor"); print(trace)
   rcorIPM(m, K0, control, trace)
 }
 
-scoring <- function(m, K0, control=m$control, maxit=control$maxouter,trace=m$trace) {
-  UseMethod("scoring")
-}
+
+
+
+
+
+
+
 
