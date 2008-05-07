@@ -1,3 +1,9 @@
+2008-05-07 Søren Højsgaard <sorenh@agrsci.d>
+
+	* ipm algorithm for RCON optimized
+
+	* Version 0.2.1 uploaded 
+
 2008-04-23 Søren Højsgaard <sorenh@agrsci.dk>
 
 	* ipm algorithm for RCON models implemented in C

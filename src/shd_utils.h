@@ -3,6 +3,11 @@
 
 void schursubt(double *K, int *nvar, int *gset, int *gsetlen, double *ans);
 
+void schursubt2(double *K, int *nvar, 
+		int *gset, int *gsetlen, 		
+		int *cset, int *csetlen, 
+ 		double *TMP, double *ans);
+
 void shddet(double *Ain, int *nrA, double *ans);
 
 void shdinverse(double *A, int *nrA, double *tolin);

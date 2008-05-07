@@ -2,7 +2,6 @@ getScore   <- function(m, K, scale='original'){
   UseMethod('getScore')
 }
 
-
 getScore.rcon <- function(m, K, scale='original'){ ### OK !!!
 
   ir    <- m$intRep  

@@ -37,6 +37,11 @@ scoring <- function(m, K0,
   f       <- m$dataRep$n - 1
   S       <- m$dataRep$S
 
+  vccTerms <- m$intRep$vccI
+  eccTerms <- m$intRep$eccI
+  nrK  <- nrow(S)
+  type <- m$type
+  
   logL0   <- ellK(K0, S, f)
 
   type    <- m$type
@@ -73,6 +78,8 @@ scoring <- function(m, K0,
     repeat{
       new.theta   <- curr.theta + DISC*stepsize
       new.K       <- theta2K(m, new.theta, scale='free')
+      #new.K      <- theta2K2(new.theta, vccTerms, eccTerms, nrK, type, scale='free')
+      #print(new.K2-new.K)
       new.logL    <- ellK(new.K, S, f)
       diff.logL   <- new.logL - curr.logL
 

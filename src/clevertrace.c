@@ -56,29 +56,29 @@ void trAWBprim(double *rA, int *nrA, int *ncA,
   if (*ncA==2){
     if (*ncB==2){
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
-	bb = (int)  rA[i + *nrA*1]-1;
+	aa = (int)  rA[i]-1;
+	bb = (int)  rA[i + *nrA]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;
-	  dd = (int)  rB[j + *nrB*1]-1;
+	  gg = (int)  rB[j]-1;
+	  dd = (int)  rB[j + *nrB]-1;
 	  
 	  *rans = *rans +
-	    rW[(int) (bb+*nrW*gg)]*(aa==dd) +
-	    rW[(int) (aa+*nrW*gg)]*(bb==dd) +
-	    rW[(int) (bb+*nrW*dd)]*(aa==gg) +
-	    rW[(int) (aa+*nrW*dd)]*(bb==gg) ;
+	    rW[(bb+*nrW*gg)]*(aa==dd) +
+	    rW[(aa+*nrW*gg)]*(bb==dd) +
+	    rW[(bb+*nrW*dd)]*(aa==gg) +
+	    rW[(aa+*nrW*dd)]*(bb==gg) ;
 	}
       }
     } else { /* ncB==1 */
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
-	bb = (int)  rA[i + *nrA*1]-1;
+	aa = (int)  rA[i]-1;
+	bb = (int)  rA[i + *nrA]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;
+	  gg = (int)  rB[j]-1;
 
 	  *rans = *rans +
-	    rW[(int) (gg+*nrW*aa)]*(gg==bb) +
-	    rW[(int) (gg+*nrW*bb)]*(gg==aa);
+	    rW[(gg+*nrW*aa)]*(gg==bb) +
+	    rW[(gg+*nrW*bb)]*(gg==aa);
 	}
       ;
       }
@@ -86,24 +86,24 @@ void trAWBprim(double *rA, int *nrA, int *ncA,
   } else { /* ncA==1 */
     if (*ncB==2){
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
+	aa = (int)  rA[i]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;
-	  dd = (int)  rB[j + *nrB*1]-1;
+	  gg = (int)  rB[j]-1;
+	  dd = (int)  rB[j + *nrB]-1;
 	  
 	  *rans = *rans +
-	    rW[(int) (aa+*nrW*gg)]*(aa==dd) +
-	    rW[(int) (aa+*nrW*dd)]*(aa==gg);
+	    rW[(aa+*nrW*gg)]*(aa==dd) +
+	    rW[(aa+*nrW*dd)]*(aa==gg);
 	}
       }
     } else { /* ncB==1 */
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
+	aa = (int)  rA[i]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;
+	  gg = (int)  rB[j]-1;
 	  
 	  *rans = *rans +
-	    rW[(int) (aa+*nrW*aa)]*(aa==gg);
+	    rW[(aa+*nrW*aa)]*(aa==gg);
 	}
       }
 
@@ -125,26 +125,26 @@ void trAWBWprim(double *rA, int *nrA, int *ncA,
   if (*ncA==2){
     if (*ncB==2){
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
-	bb = (int)  rA[i + *nrA*1]-1;
+	aa = (int)  rA[i]-1;
+	bb = (int)  rA[i + *nrA]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;
-	  dd = (int)  rB[j + *nrB*1]-1;
+	  gg = (int)  rB[j]-1;
+	  dd = (int)  rB[j + *nrB]-1;
 	  
 	  *rans = *rans +	
-	    2*(rW[(int) (bb+*nrW*gg)]*rW[(int) (aa+*nrW*dd)] +
-	    rW[(int) (aa+*nrW*gg)]*rW[(int) (bb+*nrW*dd)]);
+	    2*(rW[(bb+*nrW*gg)]*rW[(aa+*nrW*dd)] +
+	       rW[(aa+*nrW*gg)]*rW[(bb+*nrW*dd)]);
 	}
       }
     } else { /* *ncB==1 */
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
-	bb = (int)  rA[i + *nrA*1]-1;
+	aa = (int)  rA[i]-1;
+	bb = (int)  rA[i + *nrA]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;
+	  gg = (int)  rB[j]-1;
 
 	  *rans = *rans +	
-	    2*(rW[(int) (aa+*nrW*gg)]*rW[(int) (bb+*nrW*gg)]);
+	    2*(rW[(aa+*nrW*gg)]*rW[(bb+*nrW*gg)]);
 	}
       ;
       }
@@ -152,23 +152,23 @@ void trAWBWprim(double *rA, int *nrA, int *ncA,
   } else { /* *ncA==1 */
     if (*ncB==2){
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
+	aa = (int)  rA[i]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;
-	  dd = (int)  rB[j + *nrB*1]-1;
+	  gg = (int)  rB[j]-1;
+	  dd = (int)  rB[j + *nrB]-1;
 	  
 	  *rans = *rans +	
-	    2*(rW[(int) (aa+*nrW*gg)]* rW[(int) (aa+*nrW*dd)]);
+	    2*(rW[(aa+*nrW*gg)]* rW[(aa+*nrW*dd)]);
 	}
       }
     } else { /* *ncB==1 */
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
+	aa = (int)  rA[i]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;
+	  gg = (int)  rB[j]-1;
 	  
 	  *rans = *rans +	
-	    rW[(int) (aa+*nrW*gg)]*rW[(int) (aa+*nrW*gg)];
+	    rW[(aa+*nrW*gg)]*rW[(aa+*nrW*gg)];
 	}
       }
     }
@@ -192,50 +192,50 @@ void trAWBVprim(double *rA, int *nrA, int *ncA,
   if (*ncA==2){
     if (*ncB==2){
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
-	bb = (int)  rA[i + *nrA*1]-1;
+	aa = (int)  rA[i ]-1;
+	bb = (int)  rA[i + *nrA]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;
-	  dd = (int)  rB[j + *nrB*1]-1;
+	  gg = (int)  rB[j]-1;
+	  dd = (int)  rB[j + *nrB]-1;
 	  //Rprintf(" %i %i %i %i\n", aa, bb, gg, dd);
 	  *rans = *rans +	
-	    rW[(int) bb+*nrV*gg] * rV[(int) dd+*nrW*aa] +
-	    rW[(int) bb+*nrV*dd] * rV[(int) gg+*nrW*aa] +
-	    rW[(int) aa+*nrV*gg] * rV[(int) dd+*nrW*bb] +
-	    rW[(int) aa+*nrV*dd] * rV[(int) gg+*nrW*bb]; 
+	    rW[bb+*nrV*gg] * rV[dd+*nrW*aa] +
+	    rW[bb+*nrV*dd] * rV[gg+*nrW*aa] +
+	    rW[aa+*nrV*gg] * rV[dd+*nrW*bb] +
+	    rW[aa+*nrV*dd] * rV[gg+*nrW*bb]; 
 	}
       }
     } else { /* *ncB==1 */
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
-	bb = (int)  rA[i + *nrA*1]-1;
+	aa = (int)  rA[i]-1;
+	bb = (int)  rA[i + *nrA]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int) rB[j + *nrB*0]-1;	  
+	  gg = (int) rB[j]-1;	  
 	  *rans = *rans +	
-	    rV[(int) gg+*nrW*aa] * rW[(int) bb + *nrV*gg] +
-	    rV[(int) gg+*nrW*bb] * rW[(int) aa + *nrV*gg];
+	    rV[gg+*nrW*aa] * rW[bb + *nrV*gg] +
+	    rV[gg+*nrW*bb] * rW[aa + *nrV*gg];
 	}
       }
     }
   } else { /* *ncA==1 */
     if (*ncB==2){
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
+	aa = (int)  rA[i]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;
-	  dd = (int)  rB[j + *nrB*1]-1;  
+	  gg = (int)  rB[j]-1;
+	  dd = (int)  rB[j + *nrB]-1;  
 	  *rans = *rans +	
-	    rW[(int) aa+*nrV*gg] * rV[(int) dd+*nrW*aa] +
-	    rW[(int) aa+*nrV*dd] * rV[(int) gg+*nrW*aa];
+	    rW[aa+*nrV*gg] * rV[dd+*nrW*aa] +
+	    rW[aa+*nrV*dd] * rV[gg+*nrW*aa];
 	}
       }
     } else { /* *ncB==1 */
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i + *nrA*0]-1;
+	aa = (int)  rA[i]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB*0]-1;	  
+	  gg = (int)  rB[j + *nrB]-1;	  
 	  *rans = *rans +	
-	    rW[(int) (aa+*nrV*gg)]*rV[(int) (gg+*nrW*aa)];
+	    rW[(aa+*nrV*gg)]*rV[(gg+*nrW*aa)];
 	}
       }
     }

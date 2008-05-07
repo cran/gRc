@@ -10,6 +10,11 @@
 
 void schursubt(double *K, int *nvar, int *gset, int *gsetlen, double *ans);
 
+void schursubt2(double *K, int *nvar, 
+		int *gset, int *gsetlen, 
+		int *cset, int *csetlen, 
+ 		double *TMP, double *ans);
+
 void shddet(double *Ain, int *nrA, double *ans);
 
 void shdinverse(double *A, int *nrA, double *tolin);
@@ -75,9 +80,88 @@ void schursubt(double *K, int *nvar, int *gset, int *gsetlen, double *ans)
       shdmatprod(Cwork, &ng, &nc, Awork, &nc, &ng, ans);    
       //Rprintf("K(gc)inv(K(cc))K(cg):\n"); printmatd(ans, &ng, &ng);
       
-      free(Awork); free(Cwork);       free(Bwork);
-
+      free(Awork); free(Cwork);  free(Bwork);
 }
+
+
+
+
+
+/*
+  Input: 
+  K: *nvar**nvar matrix
+  gset (g): A subset of 1:*nvar.
+  cset (c): Complement of g
+  Output:
+  Partitions K as Kgg, Kcg, Kgc, Kcc; 
+*/
+
+void schurpart(double *K, int *nvar, int *gset, int *gsetlen, int *cset, int *csetlen, double *ans)
+{
+  int    ng=*gsetlen, nc=*csetlen;
+  double *Kgg, *Kcg, *Kgc, *Kcc;
+
+  Kgg = ans;
+  Kcg = ans + ng*ng;
+  Kgc = Kcg + nc*ng;
+  Kcc = Kgc + ng*nc;
+
+  shdsubmatrix(K, nvar, nvar, gset, &ng, gset, &ng, Kgg);
+  //Rprintf("Kgg:\n"); printmatd(Kgg, &ng, &ng); 
+  shdsubmatrix(K, nvar, nvar, cset, &nc, gset, &ng, Kcg);
+  //Rprintf("Kcg:\n"); printmatd(Kcg, &nc, &ng); 
+  shdsubmatrix(K, nvar, nvar, gset, &ng, cset, &nc, Kgc);
+  //Rprintf("Kgc:\n"); printmatd(Kgc, &ng, &nc); 
+  shdsubmatrix(K, nvar, nvar, cset, &nc, cset, &nc, Kcc);
+  //Rprintf("Kcc:\n"); printmatd(Kcc, &nc, &nc); 
+  //Rprintf("ans:\n"); printmatd(ans, nvar, nvar); 
+}
+
+
+
+/*
+  TMP: Vector of same length (at least) as K
+*/
+void schursubt2(double *K, int *nvar, 
+		int *gset, int *gsetlen, 
+		int *cset, int *csetlen, 
+ 		double *TMP, double *ans)
+{
+  int    ng, nc;
+  double tol;
+
+  ng      = *gsetlen;
+  nc      = *csetlen; // *nvar - *gsetlen;
+
+  schurpart(K, nvar, gset, &ng, cset, &nc, TMP);
+
+  double *Kgg, *Kcg, *Kgc, *Kcc;
+
+  Kgg = TMP;
+  Kcg = TMP + ng*ng;
+  Kgc = Kcg + nc*ng;
+  Kcc = Kgc + ng*nc;
+
+  shdsolve(Kcc, &nc, Kcg, &ng, &tol); 
+  //Rprintf("inv(K(cc))K(cg):\n"); printmatd(Kcg, &nc, &ng);
+
+  shdmatprod(Kgc, &ng, &nc, Kcg, &nc, &ng, ans);   
+  //Rprintf("K(gc)inv(K(cc))K(cg):\n"); printmatd(ans, &ng, &ng);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* Matrix operations - Implementation */
@@ -95,8 +179,9 @@ void shddet(double *Ain, int *nrA, double *ans)
   Memcpy(Awork, Ain, (size_t) (nrA2));     
   
   n = *nrA;
-  jpvt = (int *) R_alloc(*nrA, sizeof(int));
+  //jpvt = (int *) R_alloc(*nrA, sizeof(int));
   
+  jpvt = (int *) malloc(*nrA *  sizeof(int));
   F77_CALL(dgetrf)(&n, &n, Awork, &n, jpvt, &info);
   
   //printmatd(Awork, &n, &n);
@@ -131,6 +216,7 @@ void shddet(double *Ain, int *nrA, double *ans)
   
   //Rprintf("%i %f %f \n", sign, modulus, ((float) sign) * exp(modulus));
   *ans = sign * exp(modulus);
+  free(jpvt);
 }
 
 
@@ -142,11 +228,18 @@ void shddet(double *Ain, int *nrA, double *ans)
 
 void shdinverse(double *A, int *nrA, double *tolin)
 {
-  int ii, jj, info, *ipiv;
+  int ii, jj, info, *ipiv, n=*nrA, n2=*nrA**nrA;
   double *B;
 
-  ipiv  = (int *) R_alloc((int) *nrA, sizeof(int)); 
-  B     = (double *) R_alloc( *nrA * *nrA, sizeof(double));
+  /*   Rprintf("shdinverse (entry):\n");  */
+  /*   Rprintf("nrA: %i\n", *nrA); */
+  /*   printmatd(A, nrA, nrA);  */
+  B     = (double *) R_alloc(n2, sizeof(double)); //Rprintf("B ok...\n"); 
+  ipiv  = (int *)    R_alloc(n, sizeof(int));     //Rprintf("ipiv ok...\n"); 
+
+  //B     = (double *) malloc(n2 * sizeof(double)); //Rprintf("B ok...\n");
+  //ipiv  = (int *)    malloc(n *sizeof(int)); //Rprintf("ipiv ok...\n");
+  
   for (ii=0; ii<*nrA; ii++){
     for (jj=0; jj<*nrA; jj++){
       if (ii==jj){
@@ -156,10 +249,13 @@ void shdinverse(double *A, int *nrA, double *tolin)
       }
     }
   }
+  //Rprintf("diag:\n"); printmatd(B, nrA, nrA);  
 
   F77_CALL(dgesv)(nrA, nrA, A, nrA, ipiv, B, nrA, &info);
-  // printmatd(B, nrA, nrA);
-  Memcpy(A, B, (size_t) (*nrA * *nrA));   
+
+  Memcpy(A, B, (size_t) n2);   
+  //Rprintf("shdinverse (exit):\n"); printmatd(A, nrA, nrA);
+  //free(ipiv); free(B);
 }
 
 
@@ -177,7 +273,6 @@ void shdmatprod(double *x, int *nrx, int *ncx,
 }
 
 
-
 /* shdsolve
    ========
    Solves the system Ax=B; returns the answer in B
@@ -186,7 +281,7 @@ void shdmatprod(double *x, int *nrx, int *ncx,
 void shdsolve(double *A, int *nrA, double *B, int *ncB, double *tolin)
 {
   int info;
-  // int *ipiv  = (int *) R_alloc((int) *nrA, sizeof(int));    
+  //int *ipiv  = (int *) R_alloc((int) *nrA, sizeof(int));    
   int *ipiv  = (int *) malloc (*nrA * sizeof(int)); 
   F77_CALL(dgesv)(nrA, ncB, A, nrA, ipiv, B, nrA, &info);
   free(ipiv);
@@ -205,14 +300,9 @@ void shdsolve(double *A, int *nrA, double *B, int *ncB, double *tolin)
 void shdsubmatrix(double *A, int *nrA, int *ncA, 
 	       int *gen1, int *gen1len, int *gen2, int *gen2len, double *ans)
 {
-  int ii, jj, kk;
-  //  double *ans;
-  
+  int ii, jj, kk;  
   //Rprintf("In shdsubmatrix:\n");
   //printveci(gen1, gen1len);  printveci(gen2, gen2len); printmatd(A, nrA, ncA);
-
-  // ans = (double *) R_alloc(*nrA * *ncA, sizeof(double));
-  // ans = (double*) malloc (*nrA* *ncA * sizeof(double)); 
 
   kk = 0;
   for (jj=0; jj<*gen2len; jj++){
@@ -221,28 +311,20 @@ void shdsubmatrix(double *A, int *nrA, int *ncA,
       ans[kk++] = A[gen1[ii] + *nrA * gen2[jj]];
     }
   }
-  //printmatd(ans, nrA, ncA);
-  //printmatd(ans, gen1len, gen2len);
-  //Rprintf("exit shdsubmatrix\n");
-  //Memcpy(A, ans, (size_t) (*gen1len * *gen2len));   
-  //free(ans);
 } 
 
 void shdtraceAB(double *A, int *nrA, int *ncA,
 		double *B, int *nrB, int *ncB, double *ans)
 {
   int ii;
-  double x=0, *Awork;
+  double x=0;
 
-  Awork = (double *) R_alloc(*nrA * *ncB, sizeof(double));  
-  shdmatprod(A, nrA, ncA, B, nrB, ncB, Awork);    
-  
-  for (ii=0; ii<*nrA; ii++){
-    x = x + Awork[ii*(1+*nrA)];
+  for (ii=0; ii<*nrA**nrA; ii++){
+    x=x+A[ii]*B[ii];
   }
-  // Rprintf("tr: %f\n", x);
+  
+  //Rprintf("tr: %f\n", x);
   *ans=x;
-
 }
 
 
@@ -304,13 +386,11 @@ int doublecmp(const void *v1, const void *v2){
 
 void shdunique(double *gen, int *ngen, int *nunique, int *nvar, double *ans)
 {
-
-  int ii, kk=0;
+  int ii, jj, found, kk=0;
   if (*ngen==1){
-    *nunique = 1;
+    kk=*nunique = 1;
     ans[0] = gen[0];
-    //Rprintf("%f %f\n", ans[0], gen[0]);
-    //printvecd(ans, nvar);
+    //Rprintf("%f %f\n", ans[0], gen[0]); printvecd(ans, nvar);
   } else { 
     Memcpy(ans, gen, (size_t) *ngen);              // printvecd(ans, ngen);
     qsort(ans, *ngen, sizeof(double), doublecmp);  // printvecd(ans, ngen);
@@ -320,11 +400,26 @@ void shdunique(double *gen, int *ngen, int *nunique, int *nvar, double *ans)
 	ans[kk++] = ans[ii];
       }
     }
-    for (ii=kk; ii<*ngen;ii++)
-      ans[ii] = -1;
     *nunique = kk;
+    //for (ii=kk; ii<*nvar;ii++)
+    //  ans[ii] = -1;
   }
-  // printvecd(ans, ngen);
+  
+  for (ii=0; ii<*nvar; ii++){
+    found=0;
+    for (jj=0; jj<*nunique; jj++){
+      if (ans[jj]==ii){
+	found=1;
+	break;
+      }
+    }
+    if (found==0){
+      //Rprintf(" %i\n", ii);
+      ans[kk++] = ii;
+      
+    }
+  }
+
   //Rprintf(" %i\n", *nunique);  
 }
 

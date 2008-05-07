@@ -1,3 +1,86 @@
+## New !!
+# theta2K2 <- function(theta, vccTerms, eccTerms, nrK, type, scale='original'){
+#   if (type=="rcon")
+#     theta2K2.rcon(theta, vccTerms, eccTerms, nrK, scale)
+# }
+
+# K2theta2 <- function(K, vccTerms, eccTerms, type, scale='original'){
+#   if (type=="rcon")
+#     K2theta2.rcon(K, vccTerms, eccTerms, scale)
+
+# }
+
+# theta2K2.rcon <- function(theta, vccTerms, eccTerms, nrK, scale='original'){
+  
+#   K        <- matrix(0, nrow=nrK, ncol=nrK)
+#   lvcc     <- length(vccTerms)
+#   lecc     <- length(eccTerms)
+#   nparm    <- lvcc + lecc
+  
+#   for (u in 1:lvcc){
+#     term.u <- vccTerms[[u]]
+#     val    <- theta[u]
+#     for (j in 1:nrow(term.u)){
+#       term.uj <- term.u[j,]
+#       K[term.uj,term.uj] <- val 
+#     }  
+#   }
+
+#   if (scale=='free')
+#     diag(K) <- exp(diag(K))
+  
+#   if (lecc>0){
+#     for (u in 1:lecc){
+#       term.u <- eccTerms[[u]]
+#       val <- theta[u+lvcc]
+#       for (j in 1:nrow(term.u)){
+#         term.uj <- term.u[j,]
+#         term.uj <- rep(term.uj,2)[1:2]
+#         K[term.uj[1],term.uj[2]] <- K[term.uj[2],term.uj[1]] <- val
+#       }  
+#     }
+#   }  
+#   return(K)
+# }
+
+# K2theta2.rcon <- function(m, K, scale='original'){
+
+#   vccTerms <- m$intRep$vccI
+#   eccTerms <- m$intRep$eccI
+
+#   lvcc     <- length(vccTerms)
+#   lecc     <- length(eccTerms)
+#   nparm    <- lvcc + lecc
+#   theta <- rep(NA, nparm)
+
+#   for (u in 1:length(vccTerms)){
+#     term.u <- vccTerms[[u]]
+#     #print(term.u)
+#     term.u <- term.u[[1]]
+#     #print(term.u)
+#     term.u <- rep(term.u,2)[1:2]
+#     if (scale=='free')
+#       val <- log(K[term.u[1],term.u[2]]) # lambda
+#     else
+#       val <- K[term.u[1],term.u[2]]      # eta
+#     theta[u] <- val
+#   }
+#   if (length(eccTerms)>0){
+#     for (u in 1:length(eccTerms)){
+#       term.u <- eccTerms[[u]]
+#       term.u <- term.u[1,]
+#       term.u <- rep(term.u,2)[1:2]
+#       val <- K[term.u[1],term.u[2]] 
+#       theta[u+lvcc] <- val 
+#     }
+#   }
+#   return(theta)
+# }
+
+# ## !!
+
+
+
 theta2K <- function(m, theta, scale='original'){
   UseMethod("theta2K")
 }
@@ -5,6 +88,7 @@ theta2K <- function(m, theta, scale='original'){
 K2theta <- function(m, K, scale='original'){
   UseMethod("K2theta")
 }
+
 
 ## Matrices
 theta2K.rcon <- function(m, theta, scale='original'){

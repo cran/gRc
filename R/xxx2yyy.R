@@ -70,17 +70,17 @@ getIndex.character <- function(x,vn){ match(x,vn) }
 getIndex.default   <- function(x,vn){ x }
 
 
-names2pairs <- function(x,y=x){
-  val <- as.list(rep(NA, length(x)))
-  for (i in 1:length(x)){
-    xi  <- x[i]
-    y2  <- setdiff(y,xi)
-    val[[i]] <- lapply(lapply(y2,c,xi),sort)
-  }
+# names2pairs <- function(x,y=x){
+#   val <- as.list(rep(NA, length(x)))
+#   for (i in 1:length(x)){
+#     xi  <- x[i]
+#     y2  <- setdiff(y,xi)
+#     val[[i]] <- lapply(lapply(y2,c,xi),sort)
+#   }
 
-  val <- unique(unlist(val, recursive=FALSE))
-  val
-}
+#   val <- unique(unlist(val, recursive=FALSE))
+#   val
+# }
 
 
 
