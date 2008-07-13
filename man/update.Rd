@@ -70,8 +70,9 @@ update(m1, joinecc=list(~al:an, ~an:st))
 update(m1, splitvcc=~ve+an)
 update(m1, splitecc=~me:ve+me:al)
 
-update(m1, addecc=list(~me:st+st:an,~al:an))
+
 update(m1, dropecc=list(~me:st+st:an,~al:an,~st:al))
+update(m1, addecc=list(~an:me+st:ve))
 
 
 }

@@ -43,11 +43,15 @@ rconIPM <- function(object, K0,
   vn   <- unlist(lapply(getcc(object),names))
   names(coef) <- vn
 
-  if (!is.null(control$vcov)){
-    J  <- getScore(object,K=Kwork)$J
-    dimnames(J) <- list(vn, vn)
-  } else {
+  if (object$method=="ipms"){ ## IPM without finalizing with finding score
     J <- NULL
+  } else {
+    if (!is.null(control$vcov)){
+      J  <- getScore(object,K=Kwork)$J
+      dimnames(J) <- list(vn, vn)
+    } else {
+      J <- NULL
+    }
   }
   
   ans <- list(K=Kwork, logL=logL, coef=coef, J=J)

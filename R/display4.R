@@ -1,8 +1,44 @@
 plot.rcox <- function(x,y,...){
 
+
+##   if (!("package:Rgraphviz" %in% search())){
+##     if("Rgraphviz" %in% rownames(installed.packages())){
+##       require(Rgraphviz)
+##     } else {
+##       cat("The Rgraphviz package (from Bioconductor) must be installed to display the models\n")
+##       return()
+##     }
+##   }
+
+  
+##   if (!("package:Rgraphviz" %in% search())){
+##     cat("The Rgraphviz package (from Bioconductor) must be installed...\n")
+##     return()
+##   }
+  
+##     if("Rgraphviz" %in% installed.packages()){
+##       library(Rgraphviz)
+##     } else {
+##       cat("The Rgraphviz package (from Bioconductor) must be loaded to display the models\n")
+##       return()
+##     }
+##   }
+
+  if (!require("Rgraphviz")){
+    cat("The Rgraphviz package (from Bioconductor) must be installed to display the models\n")
+    return()
+  }
+
+##   if(!("Rgraphviz" %in% rownames(installed.packages()))){
+##     cat("The Rgraphviz package (from Bioconductor) must be installed to display the models\n")
+##     return()
+##   }
+
+    
+
+  
   m2 <- x
-#  eccList <- getCC2(m2,'ecc','list')
-#  vccList <- getCC2(m2,'vcc','list')
+
 
   eccList <- getSlot(m2,'ecc')
   vccList <- getSlot(m2,'vcc')
@@ -51,6 +87,7 @@ plot.rcox <- function(x,y,...){
   }
   edL<- edL[sapply(edL,length)>0]
 
+  ##G <- new("graphNEL", nodes=V, edgeL=edL)
   G <- new("graphNEL", nodes=V, edgeL=edL)
 
   ##G <- new("graphNEL", nodes=V)

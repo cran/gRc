@@ -11,8 +11,8 @@ fit.rcox <- function(m,
     ## cat("Finding Kstart\n")
     Kstart    <- matching(m, trace=trace)$K
   }
-                                        #  else
-#    Kstart    <- findKinModel(m, KS=m$Kstart,type=m$type, regularize=TRUE)
+  
+  ##    Kstart    <- findKinModel(m, KS=m$Kstart,type=m$type, regularize=TRUE)
 
   tstart <- proc.time()
   ans <- switch(method,
@@ -21,14 +21,16 @@ fit.rcox <- function(m,
                   scoring(m, K0=Kstart, control=control, maxit=1, trace=trace)
                 },
                 "scoring"=,
-                "ipm"=
+                "ipm"=,
+                "ipms"=
                 {
                   switch(method,
                          "scoring"={
                                         #print(Kstart)
                            scoring(m, K0=Kstart, control=control, trace=trace)
                          },
-                         "ipm"={
+                         "ipm"=,
+                         "ipms"={
                                         #print(Kstart)
                            ipm(m, K0=Kstart, control=control, trace=trace)         
                          })

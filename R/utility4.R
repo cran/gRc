@@ -100,12 +100,12 @@ cc2str <- function(cc){
   }
 }
 
-ellK <- function(K, S, n){
-  value <- (n/2)*(log(det(K)) - sum(rowSums(K*S)))
+## ellK <- function(K, S, n){
+##   value <- (n/2)*(log(det(K)) - sum(rowSums(K*S)))
 
-  ##diag(crossprod(K,S))))
-  return(value)
-}
+##   ##diag(crossprod(K,S))))
+##   return(value)
+## }
 
 
 

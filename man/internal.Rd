@@ -63,7 +63,7 @@
 
 %%% Utilities
 %%% Code: utility.R
-\alias{ellK}
+%%\alias{ellK}
 \alias{getcc}
 \alias{ecc2edges}
 \alias{coef.rcox}
@@ -96,6 +96,7 @@
 \alias{names2formula.list}
 \alias{names2indices}
 \alias{names2pairs}
+\alias{indices2vectors}
 \alias{formula2string}
 \alias{formula2string.default}
 \alias{formula2string.list}

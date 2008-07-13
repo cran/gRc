@@ -10,8 +10,8 @@
   RCOX model.
 }
 \usage{
-\method{add1}{rcox}(object, scope, details = 1, trace = 0, ...)
-\method{drop1}{rcox}(object, scope, details = 1, trace = 0, stat = "wald", ...) 
+\method{add1}{rcox}(object, scope, details = 0, trace = 0, ...)
+\method{drop1}{rcox}(object, scope, details = 0, trace = 0, stat = "wald", ...) 
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

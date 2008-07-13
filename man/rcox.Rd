@@ -8,7 +8,7 @@
 }
 \usage{
 rcox(gm = NULL, vcc = NULL, ecc = NULL, type = c("rcon", "rcor"),
-method = c("scoring", "ipm", "matching", "hybrid1"),
+method = "ipm",
 fit = TRUE, data = NULL, S = NULL, n = NULL, Kstart, control = list(),
 details=1, trace=0)
 }
@@ -19,11 +19,7 @@ details=1, trace=0)
   \item{vcc}{List of vertex colour classes for the model}
   \item{ecc}{List of edge colour classes for the model}
   \item{type}{Type of model. Default is RCON}
-  \item{method}{Estimation method. Default is 'scoring' which is
-    stabilised Fisher scoring. An alternative is 'ipm' which is
-    iterative partial maximisation. The method 'matching' is score
-    matching followed by one step with Fisher scoring.  The method 'hybrid1' is for
-    internal use and should not be called directly}
+  \item{method}{Estimation method; see 'Details' below. }
   \item{fit}{Should the model be fitted}
   \item{data}{A dataframe}
   \item{S}{An empirical covariance matrix (as alternative to giving data
@@ -39,9 +35,24 @@ details=1, trace=0)
   %\item{complement}{If FALSE, the edges of the model is returned. If
   %  TRUE, the edges not in the model is returned}
 }
-% \details{
-%   ~~ If necessary, more details than the description above ~~
-% }
+ \details{
+   Estimation methods:
+
+   'ipm' (default) is iterative partial maximization
+   which when finished calculates the information matrix so that
+   approximate variances of the parameters can be obtained using vcov().
+
+   'ipms' is iterative partial maximization without
+   calculating the information matrix. This is the fastest method.
+   
+   'scoring' is stabilised Fisher scoring.
+   
+   'matching' is score matching followed by one step with Fisher
+   scoring.  
+
+   'hybrid1' is for
+   internal use and should not be called directly
+ }
 \value{
   A model object of type 'RCOX'.
 }

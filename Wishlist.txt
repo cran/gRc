@@ -1,3 +1,6 @@
+	* Write package intro
+
+	* Write vignette
 
 	* rconipm.c should do ips step on atomic vcc's
 	

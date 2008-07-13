@@ -4,7 +4,7 @@
 
 
 
-add1.rcox <- function(object, scope, details=1, trace=0, ...){
+add1.rcox <- function(object, scope, details=0, trace=0, ...){
   n       <- dataRep(object,"n")
   if (missing(scope)){
     eNew <- getedges(object, complement=TRUE)
@@ -25,16 +25,14 @@ add1.rcox <- function(object, scope, details=1, trace=0, ...){
   res <- rep(NA, length(eNew))
   for (i in 1:length(eNew)){
     e      <- eNew[i]
-    ##mtmp   <- update(object, addecc=list(e))
     mtmp   <- update(object, addecc=e)
     dev    <- -2*(logL(object)-logL(mtmp))
     res[i] <- dev
   }
 
   eNew <- .addccnames(eNew,"ecc")
-  ##ans <- data.frame(cc=sapply(tocc(eNew), cc2str), X2=res, df=1)
-  ans <- data.frame(cc=names(eNew), X2=res, df=1)
-  ans <- .addStat(ans, n=n, direction="add")
+  ans  <- data.frame(cc=names(eNew), X2=res, df=1)
+  ans  <- .addStat(ans, n=n, direction="add")
   
   attr(ans,"ccterms") <- eNew
   ans2 <- structure(list(tab=ans, cc=eNew, details=details), class=c("statTable","data.frame"))
@@ -63,9 +61,9 @@ print.statTable <- function(x,...){
 ## Calculate test statistic for deletion of each ecc in the model
 ## Note: By default based on Wald statistics from existing model
 ##
-drop1.rcox <- function(object, scope, details=1, trace=0, stat="wald", ...){
+drop1.rcox <- function(object, scope, details=0, trace=0, stat="wald", ...){
   stat <- match.arg(stat,c("wald","dev"))
-  n   <- dataRep(object,"n")
+  n    <- dataRep(object,"n")
 
   if (missing(scope))
     ec  <- getSlot(object,'ecc')
@@ -86,7 +84,7 @@ drop1.rcox <- function(object, scope, details=1, trace=0, stat="wald", ...){
     b   <- coef(object)
     ofs <- length(getSlot(object,"vcc"))
   
-    ccidx <- sapply(ec, matchLL2, ec)
+    ccidx <- sapply(ec, matchLL2, ec) # FIXME: What is this???
     lcc   <- length(ccidx)
     for (i in ccidx){    
       i2   <- i + ofs

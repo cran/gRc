@@ -14,77 +14,92 @@ update.rcox <- function(object,
                         trace=object$trace,
                         ...){
 
+
+  .intersectListList <- function(addccV, oldccV){
+    x <- lapply(addccV,
+                function(ccnew){
+                  lapply(oldccV,
+                         function(ccold){ intersect(ccnew,ccold) })})
+    x
+  }
+
+  nodes <- object$nodes
+  
   if (!is.null(joinvcc)){
-    old.ccl   <- getSlot(object,"vcc")
-    joinvcc   <- .ccl2names(joinvcc, old.ccl)
-    new.ccl   <- .joincc(joinvcc, old.ccl)
+    oldcc   <- getSlot(object,"vcc")
+    joinvcc   <- .ccl2names(joinvcc, oldcc)
+    new.ccl   <- .joincc(joinvcc, oldcc)
     new.ccl   <- .addccnames(new.ccl, type="vcc")
     vcc       <- new.ccl
     if (trace>=1)cat(".joining vcc:", toLisp(joinvcc),"\n")
   }
 
   if (!is.null(joinecc)){
-    old.ccl   <- getSlot(object,"ecc")
-    joinecc   <- .ccl2names(joinecc, old.ccl)
-    new.ccl   <- .joincc(joinecc, old.ccl)
+    oldcc   <- getSlot(object,"ecc")
+    joinecc   <- .ccl2names(joinecc, oldcc)
+    new.ccl   <- .joincc(joinecc, oldcc)
     new.ccl   <- .addccnames(new.ccl, type="ecc")
     ecc       <- new.ccl
     if (trace>=1)cat(".joining ecc:", toLisp(joinecc),"\n")
   }
   
   if (!is.null(splitvcc)){
-    old.ccl    <- getSlot(object,"vcc")
-    splitvcc   <- .ccl2names(splitvcc, old.ccl)
-    new.ccl    <- .splitcc(splitvcc, old.ccl)
+    oldcc    <- getSlot(object,"vcc")
+    splitvcc   <- .ccl2names(splitvcc, oldcc)
+    new.ccl    <- .splitcc(splitvcc, oldcc)
     new.ccl    <- .addccnames(new.ccl, type="vcc")
     vcc        <- new.ccl
     if (trace>=1)cat(".splitting vcc:", toLisp(splitvcc),"\n")
   }
   
   if (!is.null(splitecc)){
-    old.ccl    <- getSlot(object,"ecc")
-    splitecc   <- .ccl2names(splitecc, old.ccl)
-    new.ccl    <- .splitcc(splitecc, old.ccl)
+    oldcc   <- object$ecc
+    oldccV  <- object$intRep$eccV
+    splitecc   <- .ccl2names(splitecc, oldcc)    
+    
+    new.ccl    <- .splitcc(splitecc, oldcc)
     new.ccl    <- .addccnames(new.ccl, type="ecc")
     ecc        <- new.ccl
     if (trace>=1)cat(".splitting ecc:", toLisp(splitecc),"\n")
   }
-  
-  if (!is.null(addecc)){
-    old.ccl    <- getSlot(object,"ecc")
-    if (length(old.ccl)>0){        
-      if (is.L(addecc)){
-        addecc <- lapply(addecc, list)
-        class(addecc)<- c("colourClass", "list")
-      }
-      ##print("1111")
-      addecc  <- .ccl2names(addecc, old.ccl)
-      ##print("2222")
-      idx     <- sapply(addecc, function(e1)
-                        any(is.na(sapply(e1, matchLL2, old.ccl))) )
 
-      addecc  <- addecc[idx]
-      new.ccl <- unionL2L2(addecc, old.ccl)
-      ecc      <- new.ccl
-    } else {
+  if (!is.null(addecc)){
+    oldcc   <- object$ecc
+    oldccV  <- object$intRep$eccV
+    addecc  <- formula2names(addecc)
+                                        #cat("addecc:\n"); print(addecc)
+                                        #cat("oldecc:\n"); print(oldcc)
+    if (length(oldcc)==0){
       ecc <- addecc
-    }    
+    } else {
+      addccV <- indices2vectors(names2indices(formula2names(addecc), nodes, matrix=TRUE))
+      x      <- .intersectListList(addccV, oldccV)
+      if (length(unlist(x))>0)
+        stop("Can not add ecc to model\n");
+      ecc <- c(oldcc, addecc)
+    } 
     ecc    <- .addccnames(ecc, type="ecc")
-    ### print(ecc)
     if (trace>=1)cat(".add ecc:", toLisp(addecc),"\n")
   }
-
-
   
   if (!is.null(dropecc)){
-    old.ccl    <- getSlot(object,"ecc")
-    dropecc   <- .ccl2names(dropecc, old.ccl)
-    idx <- sapply(dropecc, matchLL2, old.ccl)
-    idx <- which(!is.na(idx))
-    dropecc <- dropecc[idx]    
-    idx <- sapply(dropecc, matchLL2, old.ccl)
-    new.ccl <- old.ccl[-idx]    
-    ecc        <- new.ccl
+    oldcc   <- object$ecc
+    oldccV  <- object$intRep$eccV
+    dropecc  <- formula2names(dropecc)
+
+    dropccV <- indices2vectors(names2indices(formula2names(dropecc), nodes, matrix=TRUE))
+    #print(dropccV)
+    #print(oldccV)
+    
+                                        #    idx       <- sapply(dropecc, matchLL2, oldcc)
+    idx <- unlistPrim(lapply(dropecc, matchLL2, oldcc))
+    idx       <- which(!is.na(idx))
+    dropecc   <- dropecc[idx]    
+    #idx       <- sapply(dropecc, matchLL2, oldcc)
+    idx       <- unlistPrim(lapply(dropecc, matchLL2, oldcc))
+    
+    new.ccl   <- oldcc[-idx]    
+    ecc       <- new.ccl
 
     if (trace>=1)cat(".drop ecc:", toLisp(dropecc),"\n")
   }
@@ -118,6 +133,8 @@ update.rcox <- function(object,
     object$fitInfo <- NULL
   return(object)
 }
+
+
 
 
 

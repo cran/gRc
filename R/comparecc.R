@@ -1,4 +1,103 @@
 
+## comparecc2 <- function(object, cc1=NULL, cc2=NULL, type='ecc', stat='wald',
+##                        crit="aic",
+##                        alpha=ifelse(crit=="aic", 0, 0.05),
+##                        headlong = TRUE,
+##                        details=1){
+
+
+    
+##   ## Relevant for Wald:
+##   ##
+##   if (stat=="wald"){
+##     V <- vcov(object)
+##     b <- coef(object)
+##   }
+
+##   ofs    <- ifelse(type=="ecc", length(object$vcc), 0)
+##   cc      <- object[[type]]
+##   #ccnames <- names(cc)
+##   #lcc     <- length(cc)
+
+  
+##   if (is.null(cc1)){
+##     cc1  <- cc;         ##cat("cc1 is NULL. Setting cc1 to all ccs\n")
+##     cc1N <- object$intRep[[paste(type,"V",sep='')]]
+##   }
+##   if (is.null(cc2)){
+##     cc2  <- cc;         ##cat("cc2 is NULL. Setting cc2 to all ccs\n")
+##     cc2N <- object$intRep[[paste(type,"V",sep='')]]
+##   }  
+##   if (is.L(cc1)){
+##     cc1 <- list(cc1);  ##cat("cc1 is a colour class. Changing to colour class list...\n")
+##   }
+##   if (is.L(cc2)){
+##     cc2 <- list(cc2);  ##cat("cc2 is a colour class. Changing to colour class list...\n")
+##   }
+
+##   len1  <- length(cc1)
+##   len2  <- length(cc2)
+##   combs <- combn(len1, 2, simplify=FALSE) # FIXME: a hack...
+  
+##   optModel  <- object
+##   optStat   <- -9999
+##   optCC1    <- obtCC2 <- NULL
+##   statlist  <- list()
+
+##                                         #print(cc1N);  print(cc2N)
+  
+##   for (kk in 1:length(combs)){
+##     ii <- combs[[kk]][1]
+##     jj <- combs[[kk]][2]
+##                                         #cat(sprintf("kk %d ii %d jj %d\n", kk, ii, jj))
+##     if (!setequal(cc1N[[ii]], cc2N[[jj]])){
+      
+##       if (stat=="wald"){
+##         cat("doing Wald")
+##         cstat <- c(.findWald(ii+ofs, jj+ofs,  b,  V), 1)
+##       } else{
+##         cat("doing LR")
+##         switch(type,
+##                "ecc"={
+##                  mtmp <- update(object, joinecc=list(cc1[[ii]], cc2[[jj]]))
+##                },
+##                "vcc"={
+##                  mtmp <- update(object, joinvcc=list(cc1[[ii]], cc2[[jj]]))
+##                })
+##         cstat <- c(-2*(logL(mtmp)-logL(object)), 1) # Deviance for reduction
+##       }
+      
+##       statval  <- compareModel(cstat, crit=crit)
+##       cat("-------------\nstat:", statval,"\n")     
+##       cat("cc1:", ii, paste(unlist(formula2string(names2formula(cc1[[ii]]))),collapse=" "),"\n")
+##       cat("cc2:", jj, paste(unlist(formula2string(names2formula(cc2[[jj]]))),collapse=" "),"\n")
+
+##       if (statval > max(optStat,alpha)){
+##         optStat  <- stat
+##         optii    <- ii
+##         optjj    <- jj
+##         optCC1   <- cc1[[ii]]
+##         optCC2   <- cc1[[jj]]
+##       }
+##       statlist[[kk]] <- stat    
+##       if (headlong && optStat>alpha)
+##         break()
+##     }
+##   }
+  
+##   if (!is.null(optCC1)){
+##     optModel <- update(object, joinecc=list(cc1[[ii]], cc2[[jj]]))
+##   } else {
+##     optModel <- object
+##   }
+  
+##   ans <- list(optCC1=optCC1, optCC2=optCC2, optStat=optStat, optModel=optModel)
+
+##   return(ans)
+  
+## }
+
+
 comparecc <- function(object, cc1=NULL, cc2=NULL, type='ecc', stat='wald', details=1){
   cc      <- getSlot(object,type)
   ccnames <- names(cc)

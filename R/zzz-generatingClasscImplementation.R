@@ -84,6 +84,25 @@ setequalLL <- function(x,y){
   !(any(is.na(sapply(x, matchVL, y))) | any(is.na(sapply(y, matchVL, x))))
 }
 
+setequalLL <- function(x,y){
+  if (length(x)!=length(y))
+    return(FALSE)
+  work <- ans <- rep(NA,length(x))
+  for(ii in 1:length(x)){
+    xx <- x[[ii]]
+    for (jj in 1:length(y)){
+      if (setequal(xx, y[[jj]])){
+        ans[ii] <- jj    
+        work[jj] <- ii
+        break()
+        }
+    }
+  }
+  !any(is.na(c(ans,work)))
+}
+
+
+
 setdiffLL <- function(x,y){
   if (length(y)==0)
     return(x)

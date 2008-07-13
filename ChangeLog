@@ -1,9 +1,21 @@
+2008-07-13 Søren Højsgaard <sorenh@agrsci.d>
+
+	* Taken into account that Rgraphviz may not be installed...
+
+	* 'ipms' estimation method added
+
+	* Various optimizations
+
+	* Rgraphviz is no longer required, but if it is installed then
+	plot() will produce graphs.
+
 2008-05-07 Søren Højsgaard <sorenh@agrsci.d>
 
 	* ipm algorithm for RCON optimized
 
 	* Version 0.2.1 uploaded 
 
+	
 2008-04-23 Søren Højsgaard <sorenh@agrsci.dk>
 
 	* ipm algorithm for RCON models implemented in C
@@ -14,6 +26,7 @@
 	
 	* Version 0.2.0 uploaded 
 
+	
 2008-03-11 Søren Højsgaard <sorenh@agrsci.dk>
 
 	* fit method matches generic fit function from gRbase

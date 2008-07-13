@@ -45,22 +45,26 @@ rconScoreMatch <- function(m, control=m$control, trace=0){
 
 rconScoreTheta <- function(m){
 
-  vccTerms <- m$intRep$vcc
-  eccTerms <- m$intRep$ecc
+  vccTerms <- m$intRep$vccI
+  eccTerms <- m$intRep$eccI
 
   lvcc <- length(vccTerms)
   lecc <- length(eccTerms)
-
+  ltot <- lvcc+lecc
+  
   S <- m$dataRep$S
   n <- m$dataRep$n
   
-  A <- matrix(0, ncol=lvcc+lecc, nrow=lvcc+lecc)
-  B <- rep(0,lvcc+lecc)
+  A <- matrix(0, ncol=ltot, nrow=ltot)
+  B <- rep(0,ltot)
 
   for (u in 1:lvcc){
     Ku     <- vccTerms[[u]]
-    bu     <- trA(Ku)
-    B[u]   <- bu
+    #bu     <- trA(Ku)
+
+    #bu  <- nrow(Ku) ## This is tr(A)
+    #B[u]   <- bu
+    B[u] <- nrow(Ku)
     ##A[u,u] <- trAWB(Ku, S, Ku)
     ##A[u,u] <- .Call("trAWB", Ku, S, Ku, PACKAGE="gRc")
   }
@@ -75,7 +79,8 @@ rconScoreTheta <- function(m){
   if (lecc>0){
     
     xxxx <- .Call("trAWBlist", vccTerms, S, eccTerms, 0, PACKAGE="gRc") #OK
-    #print(xxxx)
+    zzzz <- .Call("trAWBlist", eccTerms, S, eccTerms, 1, PACKAGE="gRc") #OK
+                                        #print(xxxx)
     for (u in 1:lvcc){
       #Ku      <- vccTerms[[u]]
       for (v in 1:lecc){
@@ -85,27 +90,30 @@ rconScoreTheta <- function(m){
         #auv3 <- trAWB(Ku, S, Kv)
         #print(c(u, v, auv, auv2,auv3))        
         A[u,v+lvcc] <- A[v+lvcc,u] <- auv
+
       }
     }
 
-    xxxx <- .Call("trAWBlist", eccTerms, S, eccTerms, 1, PACKAGE="gRc") #OK
+
     kk <- 1
     for (u in 1:lecc){
       #Ku      <- eccTerms[[u]]
       for (v in u:lecc){
         #Kv     <- eccTerms[[v]]
         #auv <- xxxx[(u-1)+lecc*(v-1)+1]
-        auv  <- xxxx[kk]; kk <- kk+1
+        auv  <- zzzz[kk]; kk <- kk+1
         #auv2 <- .Call("trAWB", Ku, S, Kv, PACKAGE="gRc")
         #auv3 <- trAWB(Ku, S, Kv)
         #print(c(auv, auv2,auv3))
-        A[u+lvcc,v+lvcc] <- A[v+lvcc,u+lvcc] <- auv      
+        A[u+lvcc,v+lvcc] <- A[v+lvcc,u+lvcc] <- auv
       }
     }
-    
+
   } # if (lecc>0)
 
-  theta <- solve.default(A,B)  
+  
+  theta <- solve.default(A,B)
+  #theta <- qr.solve(A,B)  
   return(theta)
 }
 

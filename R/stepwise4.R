@@ -254,7 +254,6 @@ stepdrop1 <- function(object, criterion='aic', steps=1000, k=2,   alpha=0.05, st
   stepcount <- 1
   repeat{
 
-    ##tab  <- drop1(object, stat=stat, details=details-1)
     drop1obj <- drop1(object, stat=stat, details=details-1)
     tab <- drop1obj$tab
     
@@ -269,19 +268,15 @@ stepdrop1 <- function(object, criterion='aic', steps=1000, k=2,   alpha=0.05, st
 
     if (optstat>alpha){
       modelChange <- TRUE
-      ##cc <- attributes(tab)$ccterms[idx]
-      cc <- drop1obj$cc[idx]
+      cc          <- drop1obj$cc[idx]
       
       if (details>=1){
-        #xx <<- cc
-        #cat("Dropping: ", toLisp(cc),"\n")
-        cat("Dropping:", formula2string(names2formula(cc))[[1]],"\n")
-        
+        cat("Dropping:", formula2string(names2formula(cc))[[1]],"\n")        
         cat(.printTestResult(tab[idx,-1]),"\n\n")
       }
-      object  <- update(object, dropecc=cc)
+      object     <- update(object, dropecc=cc)
       changelist <- c(changelist, cc)
-      stepcount <- stepcount + 1
+      stepcount  <- stepcount + 1
       if (stepcount>steps)
         break()
     } else {

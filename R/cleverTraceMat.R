@@ -37,13 +37,10 @@ trAWBV <- function(A,W,B,V){
 
 
 ##############################################
-
 # extractIndexMatrix <- function(x, y) {
 #   storage.mode(x) <- storage.mode(y) <- "double"
-  
 #   .Call("eim", x, y, PACKAGE="gRc")
 # }
-
 ##############################################
 
 
