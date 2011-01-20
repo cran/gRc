@@ -28,13 +28,14 @@ listOrder.list    <- function(x){ #print("list   "); print(x);
   ##x <- lapply(x,function(v)listOrder(v))
   x <- lapply(x,
               function(v){
+                
                 #print(class(v))
                 #listOrder(v)
                 if (class(v)=="list")
                   listOrder.list(v)
                 else {
                   cl <- class(v)
-                  x <- v[order(v)] 
+                  x <- v[order(v)]
                   class(v)<- cl
                   v
                 }

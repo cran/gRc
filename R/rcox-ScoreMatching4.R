@@ -43,7 +43,32 @@ rconScoreMatch <- function(m, control=m$control, trace=0){
   return(ans)
 }
 
+
+
+
 rconScoreTheta <- function(m){
+
+#  cat("C-implementation of scorematching\n")
+  vcc <- m$intRep$vccI
+  ecc <- m$intRep$eccI
+  S <- m$dataRep$S
+  n <- m$dataRep$n
+  logL <- -99999
+
+  ans <- .Call("scorematching", 
+               S     = S, 
+               nobs  = n, 
+               vcc   = vcc, 
+               ecc   = ecc,
+               logL  = logL, 
+               debug=5, PACKAGE="gRc")
+  return(ans)
+}
+
+
+## This one is now obsolete
+##
+.rconScoreTheta <- function(m){
 
   vccTerms <- m$intRep$vccI
   eccTerms <- m$intRep$eccI
@@ -58,6 +83,7 @@ rconScoreTheta <- function(m){
   A <- matrix(0, ncol=ltot, nrow=ltot)
   B <- rep(0,ltot)
 
+  
   for (u in 1:lvcc){
     Ku     <- vccTerms[[u]]
     #bu     <- trA(Ku)
@@ -113,7 +139,10 @@ rconScoreTheta <- function(m){
 
   
   theta <- solve.default(A,B)
-  #theta <- qr.solve(A,B)  
+##   print(A)
+##   print(B)
+##   print(theta)
+                                        #theta <- qr.solve(A,B)  
   return(theta)
 }
 

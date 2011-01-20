@@ -139,6 +139,7 @@ getScore.rcor <- function(m,K, scale='original'){
 
   ## Find score vector
   ##
+  ##cat("Score - VCC\n")
   for (u in 1:lvcc){    
     ## Score for VCC 
     Ku  <-  vccTerms[[u]]
@@ -152,6 +153,7 @@ getScore.rcor <- function(m,K, scale='original'){
   }
 
   if (lecc>0){
+    ##cat("Score - ECC\n")
     ## Score for ECC:
     for (u in 1:lecc){
       Ku <- term.u <- eccTerms[[u]]
@@ -164,9 +166,18 @@ getScore.rcor <- function(m,K, scale='original'){
   ## Fisher information matrix
   ##
 
+##   Cinv<<-Cinv
+##   CC <<- C
+##   vcc <<- vccTerms
+##   ecc <<- eccTerms
+##   break
+  
+  ##cat("Information - VCC x VCC\n")
   for (u in 1:lvcc){
     Ku  <-  vccTerms[[u]]
+    ##cat("u:", u, "\n")
     for (v in 1:lvcc){
+      ##cat("v:", v, "\n")
       Kv  <- vccTerms[[v]]      
 
       if (u==v)
@@ -186,11 +197,13 @@ getScore.rcor <- function(m,K, scale='original'){
   if (lecc>0){
 
     ##xxxx <- .Call("trAWBlist", vccTerms, Cinv, eccTerms, 0, PACKAGE="gRc")
-    
+    ##cat("Information - VCC x ECC\n")
     for (u in 1:lvcc){
+      #cat("u:", u, "\n")
       ## Score for VCC x ECC
       Ku <-  vccTerms[[u]]
       for (v in 1:lecc){
+        #cat("v:", v, "\n")
         Kv <- eccTerms[[v]]
         ##val <- f * trAWB(Ku, Cinv, Kv) ## OK, sept 07
         val <- f * .Call("trAWB", Ku, Cinv, Kv, PACKAGE="gRc") ## OK, sept 07
@@ -205,11 +218,13 @@ getScore.rcor <- function(m,K, scale='original'){
 
 
     #xxxx <- .Call("trAWBWlist", eccTerms, Cinv, eccTerms, 1, PACKAGE="gRc")
-
+    ##cat("Information - ECC x ECC\n")
     kk = 1
     for (u in 1:lecc){
+      #cat("u:", u, "\n")
       Ku <- eccTerms[[u]]
       for (v in u:lecc){
+       # cat("v:", v, "\n")
         Kv  <- eccTerms[[v]]
         ##val  <- (f/2)* trAWBW(Ku, Cinv, Kv) ## OK, sept 07
         val <- (f/2) * .Call("trAWBW", Ku, Cinv, Kv, PACKAGE="gRc")
@@ -219,8 +234,6 @@ getScore.rcor <- function(m,K, scale='original'){
       }    
     }
 
-
-    
   }
   ##print(J)
   return(list(score=score, J=J))

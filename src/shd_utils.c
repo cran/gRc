@@ -371,10 +371,16 @@ void complement(int *set, int *setlen, int *nvar, int *ans)
 
 /* 
    On entry:
-   *gen is vector with *ngen elements, e.g. gen=(2,5,2,45,23,45), 
-   *ngen is length of *gen, e.g. *ngen=6. 
-   *nvar is the maximal possible element size in gen, e.g. 100; *ans must have
-   at least *nvar elements. 
+   *gen :
+   vector with *ngen elements, e.g. gen=(2,5,2,45,23,45), 
+   *ngen :
+   length of *gen, e.g. *ngen=6.
+   *nunique :
+   placeholder for answer info
+   *nvar :
+   the maximal possible element size in gen, e.g. 100; 
+   *ans : 
+   vector with at least *nvar elements. 
    
    On exit:
    *ans contains (2,5,23,45) and *nunique is 4

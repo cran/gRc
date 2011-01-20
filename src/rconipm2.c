@@ -14,7 +14,15 @@
 void modnewton(double *S, 
 	       double *K, 
 	       int *nvar, 
-	       double *gena, int *nrgen, int *ncgen, double *itmax, double *eps, 
+	       double *gena, int *nrgen, int *ncgen, 
+	       // Maximum iterations allowed
+	       double *itmax, 
+	       // Iterations performed
+	       int *inner, 
+	       // Convergence criterion; |parmchange|
+	       double *eps, 
+	       // |parmchange|
+	       double *parmchg,
 	       double *trace,
 	       int *gcsetI, 
 	       double *gcsetD,
@@ -28,7 +36,8 @@ void modnewton(double *S,
   double *subt, *S2, *K2, *Sigma2;
 
 
-  ngenElements = *nrgen**ncgen; // Rprintf("ngenElements=%d *nvar=%d *itmax=%f\n", ngenElements, *nvar, *itmax);
+  ngenElements = *nrgen**ncgen; 
+  // Rprintf("ngenElements=%d *nvar=%d *itmax=%f\n", ngenElements, *nvar, *itmax);
 
   gen     = GSETtmp;
   gen2    = GSETtmp + 1*ngenElements;
@@ -39,8 +48,8 @@ void modnewton(double *S,
   /*   Shift to 0-indexing; */
   for (ii=0;ii<ngenElements;ii++)
     gen[ii] = (gena[ii]-1);
-  if(*trace>=4){
-    Rprintf("....gen:\n"); printmatd(gen, nrgen, ncgen);
+  if(*trace>=6){
+    Rprintf("......gen:\n"); printmatd(gen, nrgen, ncgen);
   }
 
   /* Find gset, ng, cset, nc */
@@ -52,7 +61,6 @@ void modnewton(double *S,
   for (ii=0; ii<*nvar;ii++) 
     gcsetI[ii] = (int) gcsetD[ii]; 
 
-
   gset = gcsetI;
   cset = gcsetI + ng;
   nc   = *nvar - ng;
@@ -60,15 +68,12 @@ void modnewton(double *S,
   //Rprintf("gset:\n"); printveci(gset, &ng);
   //Rprintf("cset:\n"); printveci(cset, &nc);
 
-
-
   subt   = NRtmp;
   S2     = NRtmp + 1*ng*ng;
   K2     = NRtmp + 2*ng*ng;
   Sigma2 = NRtmp + 3*ng*ng;
   
-  double trIS, trISIS;
-  double trSS2;
+  double trIS, trISIS, trSS2;
   double Delta2, adj2, prevadj2=0, currparm;
   int itcount=0;
     
@@ -83,7 +88,6 @@ void modnewton(double *S,
     }
   }
   //Rprintf("Done creating gen2,gen3\n");
-
 
   // subt <- K(gc)inv(K(cc))K(cc)
   schursubt2(K, nvar, gset, &ng, cset, &nc, WORK, subt);
@@ -109,7 +113,6 @@ void modnewton(double *S,
     shdsubmatrix(K, nvar, nvar, gset, &ng, gset, &ng, K2);
     //Rprintf("K2 ok...\n");printmatd(K2, &ng, &ng);
     
-
     // Sigma2    <- solve(K[idx,idx] - subt)
     for (ii=0;ii<ng*ng;ii++){
       Sigma2[ii] = K2[ii]-subt[ii];
@@ -148,21 +151,23 @@ void modnewton(double *S,
       }
     }
     
-    if (*trace>=4){
-      Rprintf("....Inner Iteration: %i currparm: %15.12f Delta2 %f Update: %15.12f Delta Update: %15.12f\n",
+    if (*trace>=6){
+      Rprintf("......Inner Iteration: %i currparm: %15.12f Delta2 %f Update: %15.12f Delta Update: %15.12f\n",
 	      itcount, currparm, Delta2, adj2, abs(adj2-prevadj2));
     }
+
+    *parmchg = abs(adj2-prevadj2);
     
-    //printmatd(K, nvar, nvar);
-    if (abs(adj2-prevadj2) < *eps){ 
-      //Rprintf("Inner loop done...\n");
+    if (*parmchg < *eps){ 
       break;
     }
     prevadj2 = adj2;
   } // while 
-  if (*trace>=3){
-    Rprintf("...Inner loop done; iterations: %i \n", itcount);
-  }
+  *inner = itcount;
+  
+/*   if (*trace>=3){ */
+/*     Rprintf("...Inner loop done; iterations: %i \n", itcount); */
+/*   } */
 
   // EXIT: Rprintf("OUT...\n");
 }
@@ -179,10 +184,12 @@ SEXP rconipm(SEXP S, SEXP nobs, SEXP K, SEXP Glist,
 {
   R_len_t  nG=length(Glist);
   SEXP Kans, Sdims, Kdims,  Gitem, Giidims;
-  int     nrS, ncS, nrK, ncK, nrgen, ncgen, ii, jj, Gii;
+  SEXP outer, globalinner;
+  double *outerp, *globalinnerp;
+  int     nrS, ncS, nrK, ncK, nrgen, ncgen,  Gii;
   double  *rS, *rK, *rG, *Kansp;
-  double  *nobsp, *maxouterp, *maxinnerp, *logLp, *logLepsp, *deltaepsp, *convergedp, *debugp;
-  int     outcount=0, outmax;
+  double  *nobsp, *maxouterp, *maxinnerp, *logLp, *logLepsp, *deltaepsp, *convergedp, *debugp, parmchg;
+  int     outcount=0, outmax, inner;
   double  det, trKS, prevlogL=0;
   
   int ngenElements, ng, nc, maxng=0, maxnc=0, maxngenElements=0;
@@ -195,6 +202,7 @@ SEXP rconipm(SEXP S, SEXP nobs, SEXP K, SEXP Glist,
 
   PROTECT(maxouter = coerceVector(maxouter, REALSXP)) ;
   maxouterp = REAL(maxouter);
+
 
   PROTECT(maxinner = coerceVector(maxinner, REALSXP)) ;
   maxinnerp = REAL(maxinner);
@@ -219,9 +227,9 @@ SEXP rconipm(SEXP S, SEXP nobs, SEXP K, SEXP Glist,
   if (length(Sdims) < 2) error("Bad Sdims");
   nrS = INTEGER(Sdims)[0];  
   ncS = INTEGER(Sdims)[1];
-  
+
+  //S   = duplicate(S);  
   PROTECT(S = AS_NUMERIC(S));  
-  //S   = duplicate(S);
   rS  = REAL(S);
   
   /* *** K *** */
@@ -238,15 +246,23 @@ SEXP rconipm(SEXP S, SEXP nobs, SEXP K, SEXP Glist,
   Kansp = REAL(Kans);
   Memcpy(Kansp, rK, nrS*nrS);
 
+  PROTECT(outer=allocVector(REALSXP, 1));
+  outerp = REAL(outer);
+
+  PROTECT(globalinner=allocVector(REALSXP, 1));
+  globalinnerp = REAL(globalinner);
+
   outmax = (int) *maxouterp;
 
   // Allocate the necessary space for temporary variables 
   // 
-  gcsetI  = (int *)    R_alloc(nrK, sizeof(int));
-  gcsetD  = (double *) R_alloc(nrK, sizeof(double));
+  int nMAX = (int) nrK*(nrK-1)/2;
+  gcsetI  = (int *)    R_alloc(nMAX, sizeof(int));
+  gcsetD  = (double *) R_alloc(nMAX, sizeof(double));
+
   //gset    = (double *) malloc(nrK*sizeof(double));
   for (Gii=0; Gii<nG; Gii++){
-
+    
     PROTECT(Gitem   = AS_NUMERIC(VECTOR_ELT(Glist, Gii)));
     PROTECT(Giidims = getAttrib(Gitem, R_DimSymbol));
     if (length(Giidims) < 2) error("Bad Giidims");
@@ -255,7 +271,7 @@ SEXP rconipm(SEXP S, SEXP nobs, SEXP K, SEXP Glist,
     rG      = REAL(Gitem);
     
     ngenElements = nrgen * ncgen;
-    shdunique(rG, &ngenElements, &ng, &nrK, gcsetD);    
+    shdunique(rG, &ngenElements, &ng, &nMAX, gcsetD);
     nc = nrK - ng;
     
     if (ng>maxng)
@@ -271,53 +287,63 @@ SEXP rconipm(SEXP S, SEXP nobs, SEXP K, SEXP Glist,
   //Rprintf("nrK: %i maxngenElements: %i, maxng; %i maxnc: %i\n",
   //  nrK, maxngenElements, maxng, maxnc);
   
-
-
   NRtmp   = (double *) R_alloc(4*maxng*maxng, sizeof(double));
   WORK    = (double *) R_alloc(nrK*nrK, sizeof(double));
   GSETtmp = (double *) R_alloc(4*maxngenElements, sizeof(double));    
-  
-  //gcsetI   = (int*)     malloc(nrK*sizeof(int));
-  //NRtmp   = (double *) malloc(4*maxng*maxng*sizeof(double));
-  //WORK    = (double *) malloc(nrK*nrK*sizeof(double));
-  //GSETtmp = (double *) malloc(4*maxngenElements*sizeof(double));    
-  
+    
   //
   // Memory allocation done... !!
   
+  if (*debugp>=1){
+    shddet(rK, &nrS, &det);    //Rprintf("det %f\n", det);
+    shdtraceAB(rK, &nrS, &nrS, rS, &nrS, &nrS, &trKS); // Rprintf("trKS %f\n", trKS);
+    *logLp = (*nobsp/2) * (log(det)-trKS); //-(*nobsp/2)* nrS * log(6.283185) + 
+    Rprintf(".Before iteration: %i logL: %f\n", outcount, *logLp);
+    prevlogL = *logLp;
+  }
+
   while(1){
     outcount++;
+    globalinner = 0; // The maximal # of inner iterations.
     for (Gii=0; Gii<nG; Gii++){
-      if (*debugp >= 2)
-	Rprintf("..Generator %i\n", Gii);
+/*       if (*debugp >= 2) */
+/* 	Rprintf("..Generator %i\n", Gii); */
 
       PROTECT(Gitem   = AS_NUMERIC(VECTOR_ELT(Glist, Gii)));
       PROTECT(Giidims = getAttrib(Gitem, R_DimSymbol));
       if (length(Giidims) < 2) error("Bad Giidims");
-      nrgen   = INTEGER(Giidims)[0]; ncgen   = INTEGER(Giidims)[1];
+      nrgen   = INTEGER(Giidims)[0]; 
+      ncgen   = INTEGER(Giidims)[1];
       rG      = REAL(Gitem);
 
-      modnewton(rS, Kansp, &nrS, rG, &nrgen, &ncgen, maxinnerp,  
- 		deltaepsp, debugp, 
+      modnewton(rS, Kansp, &nrS, rG, &nrgen, &ncgen, maxinnerp, &inner, 
+ 		deltaepsp, 
+		&parmchg,
+		debugp, 
  		gcsetI, gcsetD, NRtmp, WORK, GSETtmp); 
-      //Rprintf("Returning... %i\n", Gii);
       UNPROTECT(2);
+
+      //printmatd(rG, &nrgen, &ncgen);
+      if (*debugp>=4){
+	shddet(Kansp, &nrS, &det);    //Rprintf("det %f\n", det);
+	shdtraceAB(Kansp, &nrS, &nrS, rS, &nrS, &nrS, &trKS); // Rprintf("trKS %f\n", trKS);
+	*logLp = (*nobsp/2) * (log(det)-trKS); //-(*nobsp/2)* nrS * log(6.283185) + 
+	Rprintf("....Generator %3i Inner iterations %i logL: %f\n", Gii, inner, *logLp);
+      }
+      if (inner>*globalinnerp) // The maximal # of inner iterations.
+	*globalinnerp = inner;
     }
 
-    //Rprintf("Fitting done...\n");
-    shddet(rK, &nrS, &det);    //Rprintf("det %f\n", det);
-
-    shdtraceAB(rK, &nrS, &nrS, rS, &nrS, &nrS, &trKS); // Rprintf("trKS %f\n", trKS);
-
+    shddet(Kansp, &nrS, &det);    //Rprintf("det %f\n", det);
+    shdtraceAB(Kansp, &nrS, &nrS, rS, &nrS, &nrS, &trKS); // Rprintf("trKS %f\n", trKS);
     *logLp = (*nobsp/2) * (log(det)-trKS); //-(*nobsp/2)* nrS * log(6.283185) + 
-
-    //Rprintf("Outer iteration: %i logL: %f\n", outcount, *logLp);
    
-    if (outcount>1){
-      if (*debugp >= 1){
-	Rprintf(".Outer iteration: %i logL: %f diff logL: %f \n",
+    if (*debugp >= 1){
+      Rprintf(".Outer iteration: %3i logL: %20.12f diff logL: %18.12f \n",
 		outcount, *logLp, *logLp-prevlogL);
-      }
+    } 
+
+    if (outcount>1){
       if (*logLp-prevlogL < *logLepsp){
 	*convergedp = 1;
 	break;
@@ -331,16 +357,17 @@ SEXP rconipm(SEXP S, SEXP nobs, SEXP K, SEXP Glist,
     prevlogL = *logLp;
   }
 
-  //  free(gcsetD); free(gcsetI); free(NRtmp); free(WORK); free(GSETtmp);
-
-
-  //Memcpy(Kansp, rK, nrS*nrS);
-
+  *outerp = outcount;
   //printmatd(Kansp, &nrS, &nrS);
   setAttrib(Kans, R_DimSymbol, Kdims); 
-  UNPROTECT(13);
-  //Rprintf("Exiting rconipm...\n");  
-  return(Kans);
+
+  SEXP res;
+  PROTECT(res = allocVector(VECSXP, 3));
+  SET_VECTOR_ELT(res, 0, Kans);           // K
+  SET_VECTOR_ELT(res, 1, outer);          // # of outer iterations
+  SET_VECTOR_ELT(res, 1, globalinner);    // max # of inner iterations
+  UNPROTECT(16);
+  return(res);
 }
 
 

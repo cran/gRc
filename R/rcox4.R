@@ -1,4 +1,10 @@
 
+## RCOX models; internal representation (slot intRep)
+## eccI[[i]]: Colour class as px2 matrix (lowest index always in 1. column)
+## vccU[[i]]: Colour class as px2 matrix
+## eccV[[i]]: Colour class as vector; each element is a pair coded as a 6-digit numer
+## vccV[[i]]: Colour class as vector; 
+
 rcox <- function(gm=NULL, vcc=NULL, ecc=NULL, 
                  type   = c('rcon','rcor'),
                  method = "ipm",
@@ -20,11 +26,11 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
               vcov     = "inf", #{if(method=="scoring" || method=="ipm") "inf" else NULL},
               nboot    = 100, 
               maxouter = 500,
-              maxinner = 250,
+              maxinner = 10,
               logL     = FALSE,
               logLeps  = 1e-6,
-              deltaeps = 1e-2,
-              hybrid1switch = 30,
+              deltaeps = 1e-3,
+              hybrid1switch = 10,
               short    = FALSE
               )
   con[(namc <- names(control))] <- control
@@ -44,6 +50,9 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
   dataRep  <- .buildDataRepresentation (data, S, n, usedVars, type, trace)
   nodes    <- dataRep$nodes
 
+    if (trace>=2)
+    cat("..Building data representation - done\n")
+
   ####
   #### Standard representation (remove gm part)
   ####
@@ -53,11 +62,13 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
   stdRep   <- .buildStandardRepresentation (gmN, vccN, eccN,
                                             dataNames=dataRep$dataNames, trace)
 
+
   ## List representation of model (with names of variables)
   ##
   vccN     <- .addccnames(stdRep$vccN, type="vcc")
+
   eccN     <- .addccnames(stdRep$eccN, type="ecc")
-  
+
   if (trace>=2)
     cat("..Building internal representation\n")
 
@@ -89,8 +100,7 @@ rcox <- function(gm=NULL, vcc=NULL, ecc=NULL,
   ####
   if (fit){
     ans$fitInfo <- fit(ans, method=method, trace=trace, returnModel=FALSE)
-  }
-  
+  }  
   return(ans)
 }
 
@@ -127,7 +137,7 @@ print.rcox <- function(x, ...){
   if (is.null(data) & is.null(S)){
     stop("No data given...\n")
   }
-  
+
   if (!is.null(data)){    
     dataNames <- names(data)  
     S         <- cov(data)
@@ -137,7 +147,7 @@ print.rcox <- function(x, ...){
   }
 
   nodes     <- dataNames[sort(match(nodes, dataNames))]
-  
+
   S   <-  S[nodes, nodes]  
   ans <- list(S=S, n=n, dataNames=rownames(S), nodes=nodes)
 
@@ -167,18 +177,29 @@ print.rcox <- function(x, ...){
   vccI <- names2indices(vccN, dataNames, matrix=FALSE)
   eccI <- names2indices(eccN, dataNames, matrix=FALSE)
 
-  ri   <- .redundant.index(vccI)
+  #vccI <<- vccI
+  #ri   <- .redundant.index(vccI)
+
+  xxxx2 <- lapply(vccI, function(x3)
+                   {z<-do.call("rbind",x3); z[,1]<-z[,1]*10000; rowSumsPrim(z)})
+  ri <- which(removeRedundant(xxxx2, index=TRUE)>0)
+
   vccN <- vccN[ri]
 
-  ri   <- .redundant.index(eccI)
-  eccN <- eccN[ri]
+  #ri   <- .redundant.index(eccI)
+  if (length(eccI)){
+    xxxx2 <- lapply(eccI, function(x3)
+                    {z<-do.call("rbind",x3); z[,1]<-z[,1]*10000; rowSumsPrim(z)})
+    ri <- which(removeRedundant(xxxx2, index=TRUE)>0)
+    eccN <- eccN[ri]
+  }
+  
   
   varNames <- uniquePrim(unlistPrim(c(vccN,eccN)))
-  
+
   ans <- list(vccN=vccN, eccN=eccN, varNames=varNames)
   return(ans)
 }
-
 
 
 .redundant.index <- function(xxxx){

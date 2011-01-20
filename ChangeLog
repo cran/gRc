@@ -1,3 +1,10 @@
+2008-09-09 Søren Højsgaard <sorenh@agrsci.d>
+
+	* Scorematching (for RCON models) implemented in C
+
+	* Version 0.3.0 uploaded
+
+
 2008-07-13 Søren Højsgaard <sorenh@agrsci.d>
 
 	* Taken into account that Rgraphviz may not be installed...
@@ -8,6 +15,8 @@
 
 	* Rgraphviz is no longer required, but if it is installed then
 	plot() will produce graphs.
+
+	* Version 0.2.2 uploaded
 
 2008-05-07 Søren Højsgaard <sorenh@agrsci.d>
 

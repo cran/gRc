@@ -229,11 +229,14 @@ void trAWBVprim(double *rA, int *nrA, int *ncA,
 	    rW[aa+*nrV*dd] * rV[gg+*nrW*aa];
 	}
       }
-    } else { /* *ncB==1 */
+    } else {  /* *ncA==1 */ /* *ncB==1 */
       for (i=0; i<*nrA; i++){
-	aa = (int)  rA[i]-1;
+	aa = (int) rA[i]-1;
 	for (j=0; j<*nrB; j++){
-	  gg = (int)  rB[j + *nrB]-1;	  
+	  //gg = (int) rB[j + *nrB]-1;
+	  gg = (int) rB[j]-1;
+	  //Rprintf("i %i j %i aa: %i gg: %i rW-idx %i rV-idx %i \n",
+	  //  i,j, aa, gg, aa+*nrV*gg, gg+*nrW*aa);
 	  *rans = *rans +	
 	    rW[(aa+*nrV*gg)]*rV[(gg+*nrW*aa)];
 	}
@@ -499,16 +502,25 @@ SEXP trAWBWlist(SEXP Alist, SEXP W, SEXP Blist, SEXP mode)
 
 
 
+/*   PROTECT(Sdims = getAttrib(S, R_DimSymbol)); */
+/*   if (length(Sdims) < 2) error("Bad Sdims"); */
+/*   nrS = INTEGER(Sdims)[0];   */
+/*   ncS = INTEGER(Sdims)[1]; */
+
+/*   //S   = duplicate(S);   */
+/*   PROTECT(S = AS_NUMERIC(S));   */
+/*   rS  = REAL(S); */
+
 SEXP trAWBV(SEXP A, SEXP W, SEXP B, SEXP V)
 {
   int nrA, ncA, nrW, ncW, nrB, ncB, nrV, ncV;
   double *rans, *rA, *rW, *rB, *rV;
   SEXP Adims, Wdims, Bdims, Vdims, ans;
 
-  Adims = getAttrib(A, R_DimSymbol);
-  Wdims = getAttrib(W, R_DimSymbol);
-  Bdims = getAttrib(B, R_DimSymbol);
-  Vdims = getAttrib(V, R_DimSymbol);
+  PROTECT(Adims = getAttrib(A, R_DimSymbol));
+  PROTECT(Wdims = getAttrib(W, R_DimSymbol));
+  PROTECT(Bdims = getAttrib(B, R_DimSymbol));
+  PROTECT(Vdims = getAttrib(V, R_DimSymbol));
 
   PROTECT(A = AS_NUMERIC(A));
   PROTECT(W = AS_NUMERIC(W));
@@ -525,17 +537,25 @@ SEXP trAWBV(SEXP A, SEXP W, SEXP B, SEXP V)
   nrB = INTEGER(Bdims)[0];  ncB = INTEGER(Bdims)[1];
   nrV = INTEGER(Vdims)[0];  ncV = INTEGER(Vdims)[1];
 
+/*   Rprintf("nrA %i ncA %i nrW %i ncW %i nrB %i ncB %i nrV %i ncV %i\n",  */
+/*   	  nrA, ncA, nrW, ncW, nrB, ncB, nrV, ncV); */
+
   PROTECT(ans =allocVector(REALSXP,1));
   rans      = REAL(ans);
   *rans = 1000.0;
 
+/*   printmatd(rA, &nrA, &ncA); */
+/*   printmatd(rB, &nrB, &ncB); */
+
+//  Rprintf("trAWBVprim - start\n");
   trAWBVprim(rA, &nrA, &ncA,
 	     rW, &nrW, &ncW,
 	     rB, &nrB, &ncB, 
 	     rV, &nrV, &ncV, rans);
+  //  Rprintf("trAWBVprim - done\n");
 
   //Rprintf("trAWB: %f\n",rans);
-  UNPROTECT(5);
+  UNPROTECT(9);
   return(ans);
 }
 

@@ -67,8 +67,8 @@ update.rcox <- function(object,
     oldcc   <- object$ecc
     oldccV  <- object$intRep$eccV
     addecc  <- formula2names(addecc)
-                                        #cat("addecc:\n"); print(addecc)
-                                        #cat("oldecc:\n"); print(oldcc)
+    #cat("addecc:\n"); print(addecc)
+    #cat("oldecc:\n"); print(oldcc)
     if (length(oldcc)==0){
       ecc <- addecc
     } else {
@@ -79,6 +79,7 @@ update.rcox <- function(object,
       ecc <- c(oldcc, addecc)
     } 
     ecc    <- .addccnames(ecc, type="ecc")
+    #print(ecc)
     if (trace>=1)cat(".add ecc:", toLisp(addecc),"\n")
   }
   
@@ -156,7 +157,7 @@ update.rcox <- function(object,
   if ((length(idx)>1) || (!is.na(idx))){
     old.ccl <- old.ccl[-idx]
   }   
-        new.cc         <- list(unlist(cc, recursive=FALSE))
+  new.cc         <- list(unlist(cc, recursive=FALSE))
   new.ccl        <- unionL2L2(old.ccl, new.cc)
   class(new.ccl) <- union(class(old.ccl),class(cc))
   new.ccl

@@ -21,12 +21,13 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
   logL0       <- prevlogL <- ellK(K0,S,n-1)
   
   maxit       <- control$maxouter
+  #cat("maxouter:", maxit,"\n")
   logLeps     <- control$logLeps * abs(logL0)
-
+  #cat("logLeps:", logLeps, "\n")
   logL.vec    <- rep(NA, maxit)
   converged   <- FALSE
 
-  ctrl      <- object$control
+  ctrl      <- control
   deltaeps  = ctrl$deltaeps
   maxouter  = ctrl$maxouter
   maxinner  = ctrl$maxinner
@@ -37,27 +38,37 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
 
   C.curr    <- cov2cor(K0)             ## print(C.curr)
   A         <- refitA(S, C.curr, VCC);   ## First A estimate
-  
+
+                                        #cat("maxouter:", maxouter,"\n")
   itcount <- 1
   while(!converged){
     Q.curr        <- A * t((A*S)) ## Short for diag(A) %*% S %*% diag(A)
     
-    C.curr<-.Call("rconipm", S=Q.curr, nobs=nobs-1, C.curr, Glist=glist, 
+    ##cat("rcor - call C\n")
+    ansC <- .Call("rconipm", S=Q.curr, nobs=nobs-1, C.curr, Glist=glist, 
                   maxouter=maxouter, maxinner=maxinner, 
                   logL=logLINT, logLeps=logLeps, deltaeps=deltaeps,
-                  converged=convergedINT, trace=0,
+                  converged=convergedINT, debug=trace,
                   PACKAGE="gRc")
-    
+
+    C.curr<- ansC[[1]]
+
     K.curr  <- A * t((A*C.curr)) ## Short for diag(A) %*% C.curr %*% diag(A)
 
-    A       <- refitA(S, C.curr, VCC, Astart=A)
     logL    <- ellK(K.curr,S,n-1);
     dlogL   <- logL - prevlogL
     
-    if (trace>=3)
-      cat("...rcorIPM iteration", itcount, "logL:", logL, "dlogL:", dlogL, "\n")
-
+    if (trace>=2)
+      cat("..rcorIPM iteration (offdiag) ", itcount, "logL:", logL, "dlogL:", dlogL, "\n")
+    
+    A       <- refitA(S, C.curr, VCC, Astart=A)
+    ##     KKKK  <- A * t((A*C.curr)) ## Short for diag(A) %*% C.curr %*% diag(A)
+    ##     logLLLL    <- ellK(KKKK,S,n-1);
+    ##     if (trace>=2)
+    ##       cat("..rcorIPM iteration (diag)    ", itcount, "logL:", logLLLL, "dlogL:", dlogL, "\n")
+    
     logL.vec[itcount]  <- logL
+
     if (dlogL < logLeps || itcount>=maxit)
       converged <- TRUE
     else {
@@ -65,7 +76,7 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
       itcount  <- itcount + 1
     }
   }
-
+  
   coef <- K2theta(object,K.curr, scale='original')
   vn   <- unlist(lapply(getcc(object),names))
   names(coef) <- vn
@@ -76,7 +87,7 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
   } else {
     J <- NULL
   }
-   
+  
   dimnames(K.curr) <- dimnames(S)
   ans <- list(K=K.curr, logL=logL, coef=coef, J=J, logL.vec=logL.vec[1:itcount])
   return(ans)

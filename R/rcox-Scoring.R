@@ -25,30 +25,30 @@
 
 ##scoring.rcox <- function(m, K0,
                          
-scoring <- function(m, K0, 
-                    control = m$control,
+scoring <- function(object, K0, 
+                    control = object$control,
                     maxit   = control$maxouter,
-                    trace   = m$trace){
+                    trace   = object$trace){
   
   tstart <- proc.time()
   if (trace>=2)
     cat("..Fitting model with scoring\n")
 
-  f       <- m$dataRep$n - 1
-  S       <- m$dataRep$S
+  f       <- object$dataRep$n - 1
+  S       <- object$dataRep$S
 
-  vccTerms <- m$intRep$vccI
-  eccTerms <- m$intRep$eccI
+  vccTerms <- object$intRep$vccI
+  eccTerms <- object$intRep$eccI
   nrK  <- nrow(S)
-  type <- m$type
+  type <- object$type
   
   logL0   <- ellK(K0, S, f)
 
-  type    <- m$type
+  type    <- object$type
   
   fscale  <- f #sqrt(f)
     
-  theta0      <- K2theta(m, K0, scale='free')
+  theta0      <- K2theta(object, K0, scale='free')
   curr.logL   <- logL0
   curr.theta  <- theta0
   
@@ -63,7 +63,7 @@ scoring <- function(m, K0,
 
   repeat {
     itcount <- itcount + 1
-    xxx       <- getScore(m, curr.K, scale='free')
+    xxx       <- getScore(object, curr.K, scale='free')
 
     Sc      <- xxx$score
     DISC    <- try(solve.default(xxx$J + (Sc%*%t(Sc)/fscale), Sc))
@@ -77,7 +77,7 @@ scoring <- function(m, K0,
 
     repeat{
       new.theta   <- curr.theta + DISC*stepsize
-      new.K       <- theta2K(m, new.theta, scale='free')
+      new.K       <- theta2K(object, new.theta, scale='free')
       #new.K      <- theta2K2(new.theta, vccTerms, eccTerms, nrK, type, scale='free')
       #print(new.K2-new.K)
       new.logL    <- ellK(new.K, S, f)
@@ -120,14 +120,14 @@ scoring <- function(m, K0,
   if (trace>=3) cat("...Scoring iterations:", itcount, "\n")
   logL.vec <- logL.vec[!is.na(logL.vec)]
 
-  vn <- unlistPrim(lapply(getcc(m),names))
+  vn <- unlistPrim(lapply(getcc(object),names))
   names(new.theta) <- vn
 
   ## Back to original scale
-  l               <- length(getSlot(m, "vcc"))
+  l               <- length(getSlot(object, "vcc"))
   new.theta[1:l]  <- exp(new.theta[1:l])  
   dimnames(new.K) <- dimnames(S)
-  J       <- getScore(m, curr.K, scale='original')$J
+  J       <- getScore(object, curr.K, scale='original')$J
 
   dimnames(J) <- list(vn, vn)
 

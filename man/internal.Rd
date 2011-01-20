@@ -1,5 +1,8 @@
 \name{internals}
 
+\alias{evalInECC}
+\alias{evalOutECC}
+
 
 %%% Handling of generating classes
 %%% Code: generatingClassImplementation.R
@@ -109,8 +112,6 @@
 
 %%% Update model objects
 %%% Code: update.R
-%\alias{}
-%\alias{}
 %\alias{}
 
 %%% Repair K

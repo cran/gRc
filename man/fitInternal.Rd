@@ -33,13 +33,13 @@
   not be directly called by the user. 
 }
 \usage{
-scoring (m, K0, control = m$control, maxit=control$maxouter, trace = m$trace)
-ipm     (m, K0, control = m$control, trace=m$trace)
-matching(m, control=m$control, trace=m$trace)
+scoring (object, K0, control = object$control, maxit=control$maxouter, trace = object$trace)
+ipm     (object, K0, control = object$control, trace=object$trace)
+matching(object, control=object$control, trace=object$trace)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{m}{An RCOX model object (an object of class rcox.Internal)}
+  \item{object}{An RCOX model object (an object of class rcox.Internal)}
   \item{K0}{An initial value for K}
   \item{control}{A list controlling the fitting algorithms.}
   \item{maxit}{Maximal number of scoring iterations}

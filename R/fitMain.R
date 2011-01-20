@@ -1,47 +1,52 @@
 
-fit.rcox <- function(m,
-                     Kstart  = m$Kstart,
-                     method  = m$method,
-                     control = m$control,
-                     details = m$details,
-                     trace   = m$trace,
+fit.rcox <- function(object,
+                     Kstart  = object$Kstart,
+                     method  = object$method,
+                     control = object$control,
+                     details = object$details,
+                     trace   = object$trace,
                      returnModel=TRUE,...){
-  
-  if (is.null(Kstart)){
-    ## cat("Finding Kstart\n")
-    Kstart    <- matching(m, trace=trace)$K
-  }
-  
-  ##    Kstart    <- findKinModel(m, KS=m$Kstart,type=m$type, regularize=TRUE)
 
+##  cat("fit.rcox\n")
+  if (is.null(Kstart)){
+    #cat("Finding Kstart\n")
+    Kstart    <- matching(object, trace=trace)$K
+    #print(Kstart)
+  }
+
+  ##cat("Kstart:\n"); print(Kstart)
+  ##Kstart    <- findKinModel(object, KS=object$Kstart,type=object$type, regularize=TRUE)
+
+  ##print(method); print(trace)
   tstart <- proc.time()
   ans <- switch(method,
                 "matching"=
                 {
-                  scoring(m, K0=Kstart, control=control, maxit=1, trace=trace)
+                  scoring(object, K0=Kstart, control=control, maxit=1, trace=trace)
                 },
                 "scoring"=,
-                "ipm"=,
+                "ipm" =,
                 "ipms"=
                 {
                   switch(method,
                          "scoring"={
                                         #print(Kstart)
-                           scoring(m, K0=Kstart, control=control, trace=trace)
+                           scoring(object, K0=Kstart, control=control, trace=trace)
                          },
                          "ipm"=,
                          "ipms"={
                                         #print(Kstart)
-                           ipm(m, K0=Kstart, control=control, trace=trace)         
+                           zz<- ipm(object, K0=Kstart, control=control, trace=trace)         
+                           zz
                          })
                 },
                 "hybrid1"={
-                  m2 <- m
-                  ctrl          <- m$control
+                  object2 <- object
+                  ctrl          <- object$control
                   ctrl$maxouter <- ctrl$hybrid1switch
                   ctrl$vcov     <- NULL
-                  KK  <-ipm(m2, K0=Kstart, control=ctrl, trace=trace)$K
-                  scoring(m, K0=KK, control=control, trace=trace)
+                  KK  <-ipm(object2, K0=Kstart, control=ctrl, trace=trace)$K
+                  scoring(object, K0=KK, control=control, trace=trace)
                 }
                 )
   ans$method <- method
@@ -49,51 +54,51 @@ fit.rcox <- function(m,
   ans$time   <- (proc.time()-tstart)[3]
   
   if (returnModel){
-    m$Kstart   <- ans$Kstart
+    object$Kstart   <- ans$Kstart
     ans$Kstart <- NULL    
-    m$fitInfo  <- ans
-    m$method   <- method
-    return(m)
+    object$fitInfo  <- ans
+    object$method   <- method
+    return(object)
   } else {
     return(ans)
   }
 }
 
-matching      <- function(m, control=m$control, trace=m$trace){
-  if (inherits(m,"rcon"))
-    rconScoreMatch(m, control=control, trace=trace)
+matching      <- function(object, control=object$control, trace=object$trace){
+  if (inherits(object,"rcon"))
+    rconScoreMatch(object, control=control, trace=trace)
   else
-    rcorScoreMatch(m, control=control, trace=trace)
+    rcorScoreMatch(object, control=control, trace=trace)
   ##UseMethod("matching")
 }
 
-ipm <- function(m, K0, control=m$control, trace=m$trace){
-  if (inherits(m,"rcon"))
-    rconIPM(m, K0, control, trace)
+ipm <- function(object, K0, control=object$control, trace=object$trace){
+  if (inherits(object,"rcon"))
+    rconIPM(object, K0, control, trace)
   else
-    rcorIPM(m, K0, control, trace)
+    rcorIPM(object, K0, control, trace)
   ##UseMethod("ipm")
 }
 
 
-#scoring <- function(m, K0, control=m$control, maxit=control$maxouter,trace=m$trace) {
+#scoring <- function(object, K0, control=object$control, maxit=control$maxouter,trace=object$trace) {
 #  UseMethod("scoring")
 #}
 
-matching.rcon <- function(m, control=m$control, trace=m$trace){
-  rconScoreMatch(m, control=control, trace=trace)
+matching.rcon <- function(object, control=object$control, trace=object$trace){
+  rconScoreMatch(object, control=control, trace=trace)
 }
 
-matching.rcor <- function(m, control=m$control, trace=m$trace){
-  rcorScoreMatch(m, control=control, trace=trace)
+matching.rcor <- function(object, control=object$control, trace=object$trace){
+  rcorScoreMatch(object, control=control, trace=trace)
 }
 
-ipm.rcon <- function(m, K0, control=m$control, trace=m$trace){
-  rconIPM(m, K0, control, trace)
+ipm.rcon <- function(object, K0, control=object$control, trace=object$trace){
+  rconIPM(object, K0, control, trace)
 }
 
-ipm.rcor <- function(m, K0, control=m$control, trace=m$trace){
-  rcorIPM(m, K0, control, trace)
+ipm.rcor <- function(object, K0, control=object$control, trace=object$trace){
+  rcorIPM(object, K0, control, trace)
 }
 
 

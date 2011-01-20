@@ -8,12 +8,12 @@
   RCOR models) using different estimation algorithms.
 }
 \usage{
-\method{fit}{rcox}(m, Kstart=m$Kstart, method = m$method, control = m$control,
-details = m$details, trace = m$trace, returnModel = TRUE,...)
+\method{fit}{rcox}(object, Kstart=object$Kstart, method = object$method, control = object$control,
+details = object$details, trace = object$trace, returnModel = TRUE,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{m}{An RCOX model object (an object of class 'rcox')}
+  \item{object}{An RCOX model object (an object of class 'rcox')}
   \item{Kstart}{An initial value for the concentration matrix.}
   \item{method}{The specific estimation method. Can be either "scoring",
     (a modified Fisher scoring algorithm),
