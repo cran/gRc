@@ -183,7 +183,7 @@ evalOutECC <- function(object, edlist,
     dev    <- -2*(logL(object)-logL(mtmp))
     res[ii] <- dev
     
-    stat   <- .compareModelRCOX(c(dev,1), c(0,0),crit=criterion, k=k,direction="add")
+    stat   <- .compareModelRCOX(c(dev,1), c(0,0),criterion=criterion, k=k,direction="add")
 
     if (print>=1){
       sss <- sprintf(" %30s %15.10f %s", paste(unlist(e),collapse=" ~ "),
@@ -255,7 +255,7 @@ evalInECC <- function(object, edlist,
     }
 
 
-    statValue <- .compareModelRCOX(c(dev,1), c(0,0),crit=criterion, k=k,...)
+    statValue <- .compareModelRCOX(c(dev,1), c(0,0),criterion=criterion, k=k,...)
     
     if (print>=1){
       sss <- sprintf(" %30s %10.4f %15.10f %s", paste(unlist(ed),collapse=" ~ "),

@@ -40,7 +40,7 @@ calculateVCOV <- function(m, K, vcov="boot", nboot=250){
 .bootstrapVCOV <- function(m, K, nboot=250){
 
   ##cat("bootstrapVar", nboot, "\n")
-  res  <- matrix(NA, nc=length(c(getSlot(m,"vcc"),getSlot(m,"ecc"))), nr=nboot)
+  res  <- matrix(NA, ncol=length(c(getSlot(m,"vcc"),getSlot(m,"ecc"))), nrow=nboot)
   Sf   <- solve(K)
   n    <- dataRep(m, "n")
   for(i in 1:nboot){
