@@ -1,6 +1,6 @@
-8d240eb4055cc4c6e5d31a7dbfd8ccf5 *ChangeLog
-68568c05b38759ad06963c50d41b26b3 *DESCRIPTION
-ed4ecc0d3ecdf6b5d5e43f6f22f40e9c *NAMESPACE
+6a07b7981e1c72ea6bdb16410d82edfa *ChangeLog
+a567b0c4a798d50a6f093520f94e91b3 *DESCRIPTION
+3d547bb2aa84fa4abad52ee446b42ba6 *NAMESPACE
 c89888a27130d4f653dd58f851d8bc4c *R/RCON-IPM5.R
 7a9cdd76b12c264b736b9fba8842f2cc *R/add1drop1.R
 3458873434604d986be706e5a64aa1d2 *R/calculateVCOV.R
@@ -25,7 +25,7 @@ a7afddc3407e8d5d8fc6e12b608fb6e4 *R/stepwise4.R
 d5fecbb237cb04f2af7429d89b9da5c4 *R/utility4.R
 6d61a875f6dbb7b1d5d95209898f4aa7 *R/xxx2yyy.R
 a9b39b5b2bcc46dee1eb170ee14fdbdc *R/zzz-generatingClasscImplementation.R
-f533e985ee52e10d5e1c6c604467fb3b *R/zzz.R
+cf0c2adf14afb2af7388d25f5db78c2d *R/zzz.R
 077ee1932fabf3840a919071c45be0c8 *TODO.txt
 56816143b098511d0a7816c3fa85f81b *Wishlist.txt
 eeddb27f41a916395ec58ffc7bca29c9 *demo/00Index
