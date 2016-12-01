@@ -178,13 +178,14 @@ void modnewton(double *S,
 
 SEXP rconipm(SEXP S, SEXP nobs, SEXP K, SEXP Glist, 
 	     SEXP maxouter, SEXP maxinner, 
-	     SEXP logL, SEXP logLeps, SEXP deltaeps, 
+	     SEXP logLeps, SEXP deltaeps, 
 	     SEXP converged,
 	     SEXP debug)
 {
   R_len_t  nG=length(Glist);
   SEXP Kans, Sdims, Kdims,  Gitem, Giidims;
   SEXP outer, globalinner;
+  SEXP logL;
   double *outerp, *globalinnerp;
   int     nrS, ncS, nrK, ncK, nrgen, ncgen,  Gii;
   double  *rS, *rK, *rG, *Kansp;
@@ -207,7 +208,7 @@ SEXP rconipm(SEXP S, SEXP nobs, SEXP K, SEXP Glist,
   PROTECT(maxinner = coerceVector(maxinner, REALSXP)) ;
   maxinnerp = REAL(maxinner);
 
-  PROTECT(logL = coerceVector(logL, REALSXP)) ;
+  PROTECT(logL = allocVector(REALSXP, 1)) ;
   logLp = REAL(logL);
 
   PROTECT(logLeps = coerceVector(logLeps, REALSXP)) ;
@@ -361,11 +362,13 @@ SEXP rconipm(SEXP S, SEXP nobs, SEXP K, SEXP Glist,
   //printmatd(Kansp, &nrS, &nrS);
   setAttrib(Kans, R_DimSymbol, Kdims); 
 
+  // NB: only elements 0 and 3 are used currently
   SEXP res;
-  PROTECT(res = allocVector(VECSXP, 3));
+  PROTECT(res = allocVector(VECSXP, 4));
   SET_VECTOR_ELT(res, 0, Kans);           // K
   SET_VECTOR_ELT(res, 1, outer);          // # of outer iterations
-  SET_VECTOR_ELT(res, 1, globalinner);    // max # of inner iterations
+  SET_VECTOR_ELT(res, 2, globalinner);    // max # of inner iterations
+  SET_VECTOR_ELT(res, 3, logL);
   UNPROTECT(16);
   return(res);
 }

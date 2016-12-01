@@ -18,8 +18,10 @@ stepadd1  (object, criterion = "aic", steps = 1000, k = 2, alpha = 0.05,
 headlong=FALSE, random=TRUE, details=1, trace=0,...)
 stepdrop1 (object, criterion = "aic", steps = 1000, k = 2, alpha = 0.05,
 stat = "wald", headlong=FALSE, random=TRUE, details=1, trace=0,...) 
-stepjoin1 (object, scope, type = "ecc", criterion = "aic", steps = 1000, k = 2, alpha = 0.05, stat = "wald",   details = 1, trace=0) 
-stepsplit1(object, type = "ecc", criterion = "aic", steps = 1000, k = 2, alpha = 0.05, stat = "wald",   details = 1, trace=0) 
+stepjoin1 (object, scope, type = "ecc", criterion = "aic", steps = 1000,
+          k = 2, alpha = 0.05, stat = "wald",   details = 1, trace=0) 
+stepsplit1(object, type = "ecc", criterion = "aic", steps = 1000, k = 2,
+           alpha = 0.05, stat = "wald",   details = 1, trace=0) 
 
 }
 %- maybe also 'usage' for other objects documented here.

@@ -3,7 +3,7 @@ rconIPM <- function(object, K0,
                      control=object$control, trace=object$trace){
 
   if (trace>=2)
-    cat("..fitting with rconIPM (C version):\n"); 
+    cat("..fitting with rconIPM (C version):\n");
 
   t0 <- proc.time()
   S       <- object$dataRep$S
@@ -18,7 +18,7 @@ rconIPM <- function(object, K0,
   deltaeps  = ctrl$deltaeps
   maxouter  = ctrl$maxouter
   maxinner  = ctrl$maxinner
-  
+
   eccfit <- control$eccfit
   vccfit <- control$vccfit
 
@@ -39,15 +39,16 @@ rconIPM <- function(object, K0,
 
   t00 <- proc.time()
   ##cat("maxouter:", maxouter,"\n")
-  Kwork<-.Call("rconipm", S=S, nobs=nobs-1, K=K0, Glist=glist, 
-               maxouter=maxouter, maxinner=maxinner, 
-               logL=logL, logLeps=logLeps, deltaeps=deltaeps,
+  tmp <- .Call("rconipm", S=S, nobs=nobs-1, K=K0, Glist=glist,
+               maxouter=maxouter, maxinner=maxinner,
+               logLeps=logLeps, deltaeps=deltaeps,
                converged=converged, debug=trace,
-               PACKAGE="gRc")[[1]]
+               PACKAGE="gRc")
+  Kwork <- tmp[[1L]]; logL <- tmp[[4L]]
   ##Kwork <- ansC[[1]]
   ##cat("C-call:", proc.time()-t00, "\n")
   #cat("maxouter:", maxouter, "\n")
-  
+
   coef <- K2theta(object,Kwork, scale='original')
   vn   <- unlist(lapply(getcc(object),names))
   names(coef) <- vn
@@ -65,7 +66,7 @@ rconIPM <- function(object, K0,
 
   if (trace>=2)
     cat("..ipm, logL:", logL, "Time:", proc.time()-t0, "\n")
-  
+
   ##cat("exit rconIPM: Kwork: \n"); print(Kwork)
   ans <- list(K=Kwork, logL=logL, coef=coef, J=J)
   return(ans)

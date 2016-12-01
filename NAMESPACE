@@ -1,11 +1,28 @@
 useDynLib(gRc)
 exportPattern("^[^\\.]")
 
-# Default NAMESPACE created by R
-# Remove the previous line if you edit this file
+importFrom("grDevices", "heat.colors", "topo.colors")
+importFrom("graphics", "plot")
+importFrom("methods", "new")
+importFrom("stats", "as.formula", "coef", "cov", "cov2cor", "pchisq",
+           "update", "vcov")
+importFrom(MASS, mvrnorm)
+importFrom(gRbase, ellK, fit, names2pairs, removeRedundant, rowSumsPrim,
+           setdiffPrim, subsetof, uniquePrim, unlistPrim)
 
-## Import all packages listed as Imports or Depends
-## import(
-##   gRbase,
-##   graph
-## )
+S3method(add1, rcox)
+S3method(coef, rcox)
+S3method(drop1, rcox)
+S3method(fit, rcox)
+S3method(plot, rcox)
+S3method(print, atom)
+S3method(print, cc)
+S3method(print, cclist)
+S3method(print, colourClass)
+S3method(print, rcox)
+S3method(print, statTable)
+S3method(print, summary.rcox)
+S3method(summary, rcox)
+S3method(update, rcox)
+S3method(vcov, rcox)
+

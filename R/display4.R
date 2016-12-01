@@ -10,12 +10,12 @@ plot.rcox <- function(x,y,...){
 ##     }
 ##   }
 
-  
+
 ##   if (!("package:Rgraphviz" %in% search())){
 ##     cat("The Rgraphviz package (from Bioconductor) must be installed...\n")
 ##     return()
 ##   }
-  
+
 ##     if("Rgraphviz" %in% installed.packages()){
 ##       library(Rgraphviz)
 ##     } else {
@@ -24,19 +24,19 @@ plot.rcox <- function(x,y,...){
 ##     }
 ##   }
 
-  if (!require("Rgraphviz")){
-    cat("The Rgraphviz package (from Bioconductor) must be installed to display the models\n")
-    return()
-  }
+##   if (!require("Rgraphviz")){
+##     cat("The Rgraphviz package (from Bioconductor) must be installed to display the models\n")
+##     return()
+##   }
 
 ##   if(!("Rgraphviz" %in% rownames(installed.packages()))){
 ##     cat("The Rgraphviz package (from Bioconductor) must be installed to display the models\n")
 ##     return()
 ##   }
 
-    
 
-  
+
+
   m2 <- x
 
 
@@ -47,13 +47,13 @@ plot.rcox <- function(x,y,...){
 
   if (is.null(coef))
     coef <- 1:c(length(eccList)+length(vccList))
-  
+
   #l <- sapply(vccList, length)
-  
+
   o <- order(coef[1:length(vccList)])
   vccColors <- heat.colors(length(vccList))
   vccColors <- vccColors[o]
-  
+
   V <- unlist(vccList)
   V <- V[order(V)]
   vertexColors <- NULL
@@ -61,13 +61,13 @@ plot.rcox <- function(x,y,...){
     tmp <- vccList[[i]]
     #print(tmp)
     if (length(tmp)==1){
-       vcolor <- "white"    
+       vcolor <- "white"
     } else {
-       vcolor <- vccColors[i] 
+       vcolor <- vccColors[i]
     }
     d <- c(vstr = rep(vcolor, length(tmp)))
     names(d) <- tmp
-    vertexColors <- c(vertexColors, d)    
+    vertexColors <- c(vertexColors, d)
   }
 
   nAttrs <- list()
@@ -91,7 +91,7 @@ plot.rcox <- function(x,y,...){
   G <- new("graphNEL", nodes=V, edgeL=edL)
 
   ##G <- new("graphNEL", nodes=V)
-  
+
   eccColors<-topo.colors(length(eccList))
 
   edgeColors <- NULL
@@ -110,7 +110,7 @@ plot.rcox <- function(x,y,...){
           ecolor <- eccColors[i]
           d <- c(estr = ecolor)
           names(d) <- estr
-          edgeColors <- c(edgeColors, d)                  
+          edgeColors <- c(edgeColors, d)
       }
       }
     }
@@ -121,7 +121,7 @@ plot.rcox <- function(x,y,...){
     eAttrs <- list(color=edgeColors)
   else
     eAttrs <- list()
-  
+
   plot(G, "neato", nodeAttrs = nAttrs, edgeAttrs = eAttrs)
   #return(G)
 }

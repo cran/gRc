@@ -12,14 +12,14 @@
 
 
 rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
-  
+
   S     <- object$dataRep$S
   n     <- object$dataRep$n
   VCC   <- object$intRep$vccI
   glist <- object$intRep$eccI
 
   logL0       <- prevlogL <- ellK(K0,S,n-1)
-  
+
   maxit       <- control$maxouter
   #cat("maxouter:", maxit,"\n")
   logLeps     <- control$logLeps * abs(logL0)
@@ -33,7 +33,6 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
   maxinner  = ctrl$maxinner
   nobs      = n
 
-  logLINT      = 0
   convergedINT = 1
 
   C.curr    <- cov2cor(K0)             ## print(C.curr)
@@ -43,11 +42,11 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
   itcount <- 1
   while(!converged){
     Q.curr        <- A * t((A*S)) ## Short for diag(A) %*% S %*% diag(A)
-    
+
     ##cat("rcor - call C\n")
-    ansC <- .Call("rconipm", S=Q.curr, nobs=nobs-1, C.curr, Glist=glist, 
-                  maxouter=maxouter, maxinner=maxinner, 
-                  logL=logLINT, logLeps=logLeps, deltaeps=deltaeps,
+    ansC <- .Call("rconipm", S=Q.curr, nobs=nobs-1, C.curr, Glist=glist,
+                  maxouter=maxouter, maxinner=maxinner,
+                  logLeps=logLeps, deltaeps=deltaeps,
                   converged=convergedINT, debug=trace,
                   PACKAGE="gRc")
 
@@ -57,16 +56,16 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
 
     logL    <- ellK(K.curr,S,n-1);
     dlogL   <- logL - prevlogL
-    
+
     if (trace>=2)
       cat("..rcorIPM iteration (offdiag) ", itcount, "logL:", logL, "dlogL:", dlogL, "\n")
-    
+
     A       <- refitA(S, C.curr, VCC, Astart=A)
     ##     KKKK  <- A * t((A*C.curr)) ## Short for diag(A) %*% C.curr %*% diag(A)
     ##     logLLLL    <- ellK(KKKK,S,n-1);
     ##     if (trace>=2)
     ##       cat("..rcorIPM iteration (diag)    ", itcount, "logL:", logLLLL, "dlogL:", dlogL, "\n")
-    
+
     logL.vec[itcount]  <- logL
 
     if (dlogL < logLeps || itcount>=maxit)
@@ -76,7 +75,7 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
       itcount  <- itcount + 1
     }
   }
-  
+
   coef <- K2theta(object,K.curr, scale='original')
   vn   <- unlist(lapply(getcc(object),names))
   names(coef) <- vn
@@ -87,7 +86,7 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
   } else {
     J <- NULL
   }
-  
+
   dimnames(K.curr) <- dimnames(S)
   ans <- list(K=K.curr, logL=logL, coef=coef, J=J, logL.vec=logL.vec[1:itcount])
   return(ans)
@@ -95,13 +94,13 @@ rcorIPM <- function(object, K0, control=object$control, trace=object$trace){
 
 
 refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
-  
+
   d <- nrow(S)
   if (is.null(Astart))
     Astart <- rep(1,d)
   Aprev <- Astart
   iii   <- 0
-  
+
   all <- unique(unlist(vccI))
   all <- all[order(all)]
 
@@ -129,7 +128,7 @@ refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
     if ((max( (Aprev-Astart)^2) < 1e-4) | iii>=itmax){
       ##cat("Iterations:",iii,"\n\n")
       break
-    }    
+    }
     Aprev <- Astart
   }
   attr(Astart,"iterations") <- iii
@@ -146,7 +145,7 @@ refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
 #   V   <- NULL
 
 #   logL0       <- prevlogL <- ellK(K0,S,n-1)
-  
+
 #   maxit       <- control$maxouter
 #   logLeps     <- control$logLeps * abs(logL0)
 
@@ -174,7 +173,7 @@ refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
 #     A       <- refitA(S, C.curr, VCC, Astart=A)
 #     logL    <- ellK(K.curr,S,n-1);
 #     dlogL   <- logL - prevlogL
-    
+
 #     if (trace>=3)
 #       cat("...rcorIPM iteration", itcount, "logL:", logL, "dlogL:", dlogL, "\n")
 
@@ -197,7 +196,7 @@ refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
 #   } else {
 #     J <- NULL
 #   }
-   
+
 #   dimnames(K.curr) <- dimnames(S)
 #   ans <- list(K=K.curr, logL=logL, coef=coef, J=J, logL.vec=logL.vec[1:itcount])
 #   return(ans)
@@ -244,13 +243,13 @@ refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
 
 #   if (control$trace>=3)
 #     cat("...rcorFitIterative\n")
-  
+
 #   tstart <- proc.time()
 #   conv   <- control$logLepsilon
 #   itmax  <- control$maxit
 #   rconModel     <- m$call
 #   method <- rconModel$method
-  
+
 #   VCC       <- c(m$stdrep$VCCU, m$stdrep$VCCR)
 #   nam       <- m$varnames
 #   n         <- m$n
@@ -259,7 +258,7 @@ refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
 #   ll        <- d.ll <- NULL
 #   prev.logL <- iii<- 0
 #   a         <- rescaleC(S,C.curr,VCC); #print("a"); print(a)
-  
+
 #   controlNew                <- control
 #   controlNew$VCCU           <- controlNew$VCCR <- FALSE
 #   controlNew$representation <- 'stdrep'
@@ -272,17 +271,17 @@ refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
 #   rconModel$control <- controlNew
 #   rconModel$fit     <- TRUE
 #   ##print(rconModel)
-  
-#   repeat{    
+
+#   repeat{
 #     iii <- iii + 1
-   
+
 #     S.curr           <- diag(a) %*% S %*% diag(a)
 #     dimnames(S.curr) <- dimnames(S)
 #     ##print("S.curr"); print(S.curr)
-    
+
 #     ## Estimate rho
 #     rconModel$Kstart <- C.curr
-#     rconModel$S      <- S.curr    
+#     rconModel$S      <- S.curr
 #     rconModelnew     <- eval(rconModel)
 #     C.curr           <- rconModelnew$fit$K;  ##print("C.curr"); print(C.curr)
 #     ## Calculate K
@@ -290,7 +289,7 @@ refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
 
 #     ## Estimate a
 #     a         <- rescaleC(S, C.curr, VCC)
-    
+
 #     ## Monitoring convergence
 #     curr.logL <- ellK(K.curr, S, n)
 #     ll        <- c(ll, curr.logL)
@@ -318,7 +317,7 @@ refitA <- function(S, K, vccI, Astart=NULL, itmax=100){
 
 # rescaleC <- function(S,K,NSi,cstart=NULL,itmax=100){
 #   #print(S); print(K); print(NSi)
-  
+
 #   d <- nrow(S)
 #   if (is.null(cstart))
 #     cstart <- rep(1,d)

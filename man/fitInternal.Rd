@@ -33,7 +33,8 @@
   not be directly called by the user. 
 }
 \usage{
-scoring (object, K0, control = object$control, maxit=control$maxouter, trace = object$trace)
+scoring (object, K0, control = object$control, maxit=control$maxouter,
+         trace = object$trace)
 ipm     (object, K0, control = object$control, trace=object$trace)
 matching(object, control=object$control, trace=object$trace)
 }
