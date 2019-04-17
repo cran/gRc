@@ -37,7 +37,7 @@ split1(object, scope=NULL, type = "ecc", details = 1)
   \item{cc}{A list of colour classes}
 }
 \references{ ~put references to the literature/web site here ~ }
-\author{Søren Højsgaard, sorenh@agrsci.dk}
+\author{SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk}
 \note{
   Note that the keyword 'stat' is not available for split1 because this function expands
   the current and hence the Wald statistic is not available. 

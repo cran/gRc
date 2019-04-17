@@ -43,7 +43,7 @@ getedges(object, complement=FALSE)
 % }
 % \references{ ~put references to the literature/web site here ~ }
 
-\author{Søren Højsgaard, sorenh@agrsci.dk}
+\author{SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk}
 
 %\author{ ~~who you are~~ }
 %\note{ ~~further notes~~ %

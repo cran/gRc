@@ -59,7 +59,7 @@ stepsplit1(object, type = "ecc", criterion = "aic", steps = 1000, k = 2,
   Either NULL or a new RCOX model.
 }
 %\references{ ~put references to the literature/web site here ~ }
-\author{Søren Højsgaard, sorenh@agrsci.dk}
+\author{SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk}
 
 %\author{ ~~who you are~~ }
 %\note{ ~~further notes~~ 

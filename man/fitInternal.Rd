@@ -54,7 +54,7 @@ matching(object, control=object$control, trace=object$trace)
   A list with fitted values (K, logL etc).
 }
 %\references{ ~put references to the literature/web site here ~ }
-\author{Søren Højsgaard, sorenh@agrsci.dk}
+\author{SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk}
 %\note{ ~~further notes~~ %
 %
 % ~Make other sections like Warning with \section{Warning }{....} ~

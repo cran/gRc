@@ -33,7 +33,7 @@
   \item{cc}{A list of colour classes}
 }
 %\references{ ~put references to the literature/web site here ~ }
-\author{Søren Højsgaard, sorenh@agrsci.dk}
+\author{SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk}
 \note{
   Note that the keyword 'stat' is not available for add1 because this function expands
   the current model and hence the Wald statistic is not available. 

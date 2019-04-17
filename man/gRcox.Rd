@@ -18,7 +18,7 @@ The package `gRc': summary information
 
 
 \section{Authors}{
-  Søren Højsgaard, sorenh@agrsci.dk
+  SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk
 }
 \seealso{\code{\link{rcox}}}
 

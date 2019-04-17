@@ -36,7 +36,7 @@ those specified in \code{cc1}. If \code{cc1=NULL} (the default) and
   \item{cc1, cc2}{Lists of colour classes}
 }
 %%\references{ ~put references to the literature/web site here ~ }
-\author{Søren Højsgaard, sorenh@agrsci.dk}
+\author{SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk}
 %\note{ ~~further notes~~ 
 %
 % ~Make other sections like Warning with \section{Warning }{....} ~

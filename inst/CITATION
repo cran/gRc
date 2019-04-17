@@ -9,12 +9,32 @@ citEntry(entry = "Article",
   volume       = "23",
   number       = "6",
   pages        = "1--26",
+  doi          = "10.18637/jss.v023.i06",
   url          = "http://www.jstatsoft.org/v23/i06/",
 
   textVersion  =
-  paste("S�ren H�jsgaard, Steffen Lauritzen (2007).",
+  paste("Søren Højsgaard, Steffen Lauritzen (2007).",
         "Inference in Graphical Gaussian Models with Edge and Vertex Symmetries with the gRc Package for R.",
         "Journal of Statistical Software, 23(6), 1-26.",
-        "URL http://www.jstatsoft.org/v23/i06/.")
+        "URL http://www.jstatsoft.org/v23/i06/")
+)
+
+citEntry(entry = "Article",
+  title        = "Graphical {G}aussian models with edge and vertex symmetries",
+  author       = personList(as.person("S{\\o}ren H{\\o}jsgaard"),
+                   as.person("Steffen Lauritzen")),
+  journal      = "Journal of the Royal Statistical Society, Series~B",
+  year         = "2008",
+  volume       = "70",
+  number       = "5",
+  pages        = "1005--1027",
+  doi          = "10.1111/j.1467-9868.2008.00666.x",
+  url          = "https://rss.onlinelibrary.wiley.com/doi/10.1111/j.1467-9868.2008.00666.x",
+
+  textVersion  =
+  paste("Søren Højsgaard, Steffen Lauritzen (2008).",
+        "Graphical Gaussian models with edge and vertex symmetries.",
+        "Journal of the Royal Statistical Society, Series~B, 70(5), 1005-1027",
+        "URL https://rss.onlinelibrary.wiley.com/doi/10.1111/j.1467-9868.2008.00666.x")
 )
 

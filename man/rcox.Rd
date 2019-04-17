@@ -57,7 +57,7 @@ details=1, trace=0)
   A model object of type 'RCOX'.
 }
 %\references{ ~put references to the literature/web site here ~ }
-\author{Søren Højsgaard, sorenh@agrsci.dk}
+\author{SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk}
 \note{
   demo("gRc-JSS") gives a more comprehensive demo. 
 }

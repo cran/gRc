@@ -196,6 +196,6 @@
   These functions should not be called directly by the user.
 }
 
-\author{Søren Højsgaard, sorenh@agrsci.dk}
+\author{SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk}
 \keyword{internal}% at least one, from doc/KEYWORDS
 

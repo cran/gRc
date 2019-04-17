@@ -10,12 +10,17 @@ is.V <- function(x){
 }
 
 
+## as.L <- function(x){
+##   if(is.list(x) && sapply(x, is.V)){
+##     as.cc(x)
+##   } else {
+##     stop("Can not create L\n")
+##   }
+## }
+
 as.L <- function(x){
-  if(is.list(x) && sapply(x, is.V)){
+    if (!is.L(x)) stop("Can not create L\n")
     as.cc(x)
-  } else {
-    stop("Can not create L\n")
-  }
 }
 
 
@@ -24,13 +29,34 @@ is.L <- function(x){
 }
 
 
+## as.L2 <- function(x){
+##     cat("as.L2: \n"); print(x)
+##     xx <<- x
+##     stop()
+##     if(is.list(x) && sapply(x, is.L)){
+##         out <- as.cclist(x)
+##         print(out)
+##         out
+##     } else {
+##         stop("Can not create L2\n")
+##     }
+## }
+
+
+## as.L2 <- function(x){
+##     if(is.list(x) && all(sapply(x, is.L))){
+##         out <- as.cclist(x)
+##         out
+##     } else {
+##         stop("Can not create L2\n")
+##     }
+## }
+
 as.L2 <- function(x){
-  if(is.list(x) && sapply(x, is.L)){
+    if (!is.L2(x)) stop("Can not create L2\n")
     as.cclist(x)
-  } else {
-    stop("Can not create L2\n")
-  }
 }
+
 
 is.L2 <- function(x){
   is.list(x) && all(sapply(x, is.L)) 
@@ -46,8 +72,8 @@ matchVL <- function(x,y){
 }
 
 matchLL2 <- function(x,y){
-  z<- which(sapply(y, function(d) setequalLL(x,d)))
-  if (length(z)==0)
+  z <- which(sapply(y, function(d) setequalLL(x,d)))
+  if (length(z) == 0)
     z <- NA
   z 
 }

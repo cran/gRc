@@ -30,7 +30,7 @@ trAWBV(A,W,B,V)
   A number
 }
 %\references{ ~put references to the literature/web site here ~ }
-\author{Søren Højsgaard, sorenh@agrsci.dk}
+\author{SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk}
 %\note{
 %  The storage mode of the matrices must be 'double', see examples below
 %}

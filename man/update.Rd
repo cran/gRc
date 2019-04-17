@@ -37,7 +37,7 @@ splitvcc = NULL, joinvcc = NULL, joinecc = NULL, addecc = NULL, dropecc
   A new model object of class 'rcox'.
 }
 %\references{ ~put references to the literature/web site here ~ }
-\author{Søren Højsgaard, sorenh@agrsci.dk}
+\author{SÃ¸ren HÃ¸jsgaard, sorenh@agrsci.dk}
 
 \section{Warning}{
   Only one of the arguments pertaining to edge colour classes (i.e. ecc,
