@@ -10,13 +10,13 @@ citEntry(entry = "Article",
   number       = "6",
   pages        = "1--26",
   doi          = "10.18637/jss.v023.i06",
-  url          = "http://www.jstatsoft.org/v23/i06/",
+  url          = "https://www.jstatsoft.org/v23/i06/",
 
   textVersion  =
   paste("Søren Højsgaard, Steffen Lauritzen (2007).",
         "Inference in Graphical Gaussian Models with Edge and Vertex Symmetries with the gRc Package for R.",
         "Journal of Statistical Software, 23(6), 1-26.",
-        "URL http://www.jstatsoft.org/v23/i06/")
+        "URL https://www.jstatsoft.org/v23/i06/")
 )
 
 citEntry(entry = "Article",

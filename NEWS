@@ -1,0 +1,11 @@
+Version 0.4.4 data: 2021-03-30
+------------------------------
+
+* All old c-code has been removed.
+
+* Computation of various traces of products has been re-implemented in
+  Rcpp (Model fitting in Rcpp may be reimplemented one day).
+
+* Code has been cleaned up by commenting out unused functions.
+
+* Documentation is now based entirely on roxygen

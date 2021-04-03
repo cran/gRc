@@ -1,16 +1,70 @@
-##
-## Conversions of the type xxx2yyy
-##
+######################################################################
+#' @title Conversions of the type xxx2yyy
+#' @description Conversions of the type xxx2yyy.
+#' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
+#' @name xxx2yyy
+######################################################################
+#'
+#' @aliases formula2names formula2names.default formula2names.list
+#'   formula2names.formula formula2names.NULL names2indices
+#'   names2formula names2formula.list names2formula.default
+#'   indices2vectors
+#'   formula2string formula2string.list formula2string.default
+#'   getIndex getIndex.default getIndex.list getIndex.character
+#'    ecc2edges cc2formula
+NULL
+
+
+#' @export
+formula2string <- function(x){
+  UseMethod("formula2string")
+}
+
+#' @export
+formula2string.list <- function(x){
+  lapply(x, formula2string)
+}
+
+#' @export
+formula2string.default <- function(x){
+  paste(paste(x),collapse="")  
+}
+
+getIndex           <- function(x, vn){
+  UseMethod('getIndex')
+}
+
+getIndex.default   <- function(x, vn){
+  x
+}
+
+getIndex.list      <- function(x, vn){
+  lapply(x, function(a) getIndex(a, vn))
+}
+
+getIndex.character <- function(x, vn){
+  match(x,vn)
+}
+
 
 ## formula2names
 ##
 
-formula2names <- function(x)
+#' @export
+formula2names <- function(x){
   UseMethod("formula2names")
-formula2names.default     <- function(x){x}
+}
 
-formula2names.NULL     <- function(x){}
+#' @export
+formula2names.default     <- function(x){
+  x
+}
 
+#' @export
+formula2names.NULL     <- function(x){
+  
+}
+#' @export
 formula2names.list     <- function(x){
   lapply(x, function(x2){
     if (class(x2)=="list") {
@@ -21,10 +75,11 @@ formula2names.list     <- function(x){
   })
 }
 
+#' @export
 formula2names.formula  <- function(x){  
-  mf <- paste(deparse(x[[2]]),collapse="")
-  mf <- gsub(" +","",mf)
-  strsplit(unlist(strsplit(mf,"\\+")),":")
+  mf <- paste(deparse(x[[2]]), collapse="")
+  mf <- gsub(" +", "", mf)
+  strsplit(unlist(strsplit(mf, "\\+")), ":")
 }
 
 
@@ -69,32 +124,6 @@ indices2vectors <- function(x){
 
 
 
-
-
-
-
-
-
-formula2string <- function(x)
-  UseMethod("formula2string")
-
-formula2string.list <- function(x)
-  lapply(x, formula2string)
-  
-formula2string.default <- function(x){
-  paste(paste(x),collapse="")  
-}
-
-
-
-
-
-
-getIndex           <- function(x,vn)UseMethod('getIndex')
-getIndex.list      <- function(x,vn){ lapply(x, getIndex, vn) }
-getIndex.character <- function(x,vn){ match(x,vn) }
-##getIndex.character <- function(x,vn){ vn[x] }
-getIndex.default   <- function(x,vn){ x }
 
 
 ecc2edges <- function(x){

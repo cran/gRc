@@ -8,24 +8,22 @@
 */
 
 /* .Call calls */
-extern SEXP rconipm(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP scorematching(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
-extern SEXP trAW(SEXP, SEXP);
-extern SEXP trAWB(SEXP, SEXP, SEXP);
-extern SEXP trAWBlist(SEXP, SEXP, SEXP, SEXP);
-extern SEXP trAWBV(SEXP, SEXP, SEXP, SEXP);
-extern SEXP trAWBW(SEXP, SEXP, SEXP);
-extern SEXP trAWBWlist(SEXP, SEXP, SEXP, SEXP);
+extern SEXP _gRc_RcppExport_registerCCallable();
+extern SEXP _gRc_trAWBV_(SEXP, SEXP, SEXP, SEXP);
+extern SEXP _gRc_trAWBW_(SEXP, SEXP, SEXP);
+extern SEXP _gRc_trAWBWlist_(SEXP, SEXP, SEXP, SEXP);
+extern SEXP _gRc_trAWB_(SEXP, SEXP, SEXP);
+extern SEXP _gRc_trAWBlist_(SEXP, SEXP, SEXP, SEXP);
+extern SEXP _gRc_trAW_(SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"rconipm",       (DL_FUNC) &rconipm,       10},
-    {"scorematching", (DL_FUNC) &scorematching,  6},
-    {"trAW",          (DL_FUNC) &trAW,           2},
-    {"trAWB",         (DL_FUNC) &trAWB,          3},
-    {"trAWBlist",     (DL_FUNC) &trAWBlist,      4},
-    {"trAWBV",        (DL_FUNC) &trAWBV,         4},
-    {"trAWBW",        (DL_FUNC) &trAWBW,         3},
-    {"trAWBWlist",    (DL_FUNC) &trAWBWlist,     4},
+    {"_gRc_RcppExport_registerCCallable", (DL_FUNC) &_gRc_RcppExport_registerCCallable, 0},
+    {"_gRc_trAWBV_",                      (DL_FUNC) &_gRc_trAWBV_,                      4},
+    {"_gRc_trAWBW_",                      (DL_FUNC) &_gRc_trAWBW_,                      3},
+    {"_gRc_trAWBWlist_",                  (DL_FUNC) &_gRc_trAWBWlist_,                  4},
+    {"_gRc_trAWB_",                       (DL_FUNC) &_gRc_trAWB_,                       3},
+    {"_gRc_trAWBlist_",                   (DL_FUNC) &_gRc_trAWBlist_,                   4},
+    {"_gRc_trAW_",                        (DL_FUNC) &_gRc_trAW_,                        2},
     {NULL, NULL, 0}
 };
 
