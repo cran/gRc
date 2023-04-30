@@ -67,7 +67,7 @@ formula2names.NULL     <- function(x){
 #' @export
 formula2names.list     <- function(x){
   lapply(x, function(x2){
-    if (class(x2)=="list") {
+    if (is("x2", "list")) {
       x2
     } else {
       formula2names(x2)

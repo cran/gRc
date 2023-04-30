@@ -29,22 +29,19 @@ deviance statistic.}
 }
 \value{
 A list with entries
-\itemize{
-\item tab: A dataframe with the test results
-\item cc: A list of colour classes
-}
+* tab: A dataframe with the test results
+* cc: A list of colour classes
 }
 \description{
 Make a test for adding/dropping all colour classes in
-scope for an RCOX model.
+  scope for an RCOX model.
 }
 \note{
-\itemize{
-\item Note that the keyword 'stat' is not available for add1
-because this function expands the current model and hence the
-Wald statistic is not available.
-\item Based on fitting a new model for each new ecc, and may hence be slow.
-}
+* Note that the keyword 'stat' is not available for add1
+  because this function expands the current model and hence the
+  Wald statistic is not available.
+
+* Based on fitting a new model for each new ecc, and may hence be slow.
 }
 \examples{
 
@@ -65,7 +62,7 @@ t.1$cc
 }
 \seealso{
 \code{\link{comparecc}}, \code{\link{stepadd1}},
-\code{\link{stepdrop1}}.
+  \code{\link{stepdrop1}}.
 }
 \author{
 Søren Højsgaard, \email{sorenh@math.aau.dk}

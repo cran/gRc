@@ -33,7 +33,7 @@ K2theta(object, K, scale = "original")
 }
 \description{
 Coerce parameters in RCOX models. These functions
-should not be called directly by the user.
+  should not be called directly by the user.
 }
 \author{
 Søren Højsgaard, \email{sorenh@math.aau.dk}

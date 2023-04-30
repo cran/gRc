@@ -43,7 +43,7 @@ listOrder.list    <- function(x){ #print("list   "); print(x);
       
       #print(class(v))
       #listOrder(v)
-      if (class(v)=="list")
+      if (is(v, "list"))
         listOrder.list(v)
       else {
         cl <- class(v)

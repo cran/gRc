@@ -22,7 +22,7 @@ deviance statistic.}
 }
 \value{
 A list with entries: \item{tab}{A data frame with the test
-results} \item{cc}{A list of colour classes}
+  results} \item{cc}{A list of colour classes}
 }
 \description{
 Test for joining of two colour classes (of a specific type) by testing if
@@ -31,9 +31,9 @@ colour class and test how much this changes the fit of the model.
 }
 \note{
 Note that the keyword 'stat' is not available for split1
-because this function expands the current and hence the Wald
-statistic is not available.  Note also that join1 is simply a
-wrapper for comparecc applied to edge colour classes.
+  because this function expands the current and hence the Wald
+  statistic is not available.  Note also that join1 is simply a
+  wrapper for comparecc applied to edge colour classes.
 }
 \examples{
 
@@ -51,7 +51,7 @@ split1(m2)
 }
 \seealso{
 \code{\link{rcox}}, \code{\link{update}},
-\code{\link{comparecc}}
+  \code{\link{comparecc}}
 }
 \author{
 Søren Højsgaard, \email{sorenh@math.aau.dk}

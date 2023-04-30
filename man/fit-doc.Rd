@@ -39,8 +39,8 @@ A list with fitted values (K, logL etc).
 }
 \description{
 This is an overview over core functions used in
-connection with fitting of RCOX models. The functions described
-here will typically not be directly called by the user.
+  connection with fitting of RCOX models. The functions described
+  here will typically not be directly called by the user.
 }
 \examples{
 

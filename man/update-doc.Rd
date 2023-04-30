@@ -39,16 +39,16 @@ A new model object of class 'rcox'.
 }
 \description{
 update will update and (by default) re-fit an RCOX
-model.  It does this by extracting the call stored in the
-object, updating the call and (by default) evaluating that
-call. Sometimes it is useful to call update with only one
-argument, for example if the data frame has been corrected
+  model.  It does this by extracting the call stored in the
+  object, updating the call and (by default) evaluating that
+  call. Sometimes it is useful to call update with only one
+  argument, for example if the data frame has been corrected
 }
 \section{Warning}{
  Only one of the arguments pertaining to edge
-colour classes (i.e. ecc, splitecc, joinecc, dropecc, addecc)
-should be applied at the time. Likewise for the arguments
-pertaining to the vertex colour classes.
+  colour classes (i.e. ecc, splitecc, joinecc, dropecc, addecc)
+  should be applied at the time. Likewise for the arguments
+  pertaining to the vertex colour classes.
 
 The result will otherwise be highly unpredictable and is likely to cause an
 error.

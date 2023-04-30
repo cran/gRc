@@ -1,8 +1,8 @@
 citHeader("To cite gRc in publications use:")
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
   title        = "Inference in Graphical {G}aussian Models with Edge and Vertex Symmetries with the {gRc} Package for {R}",
-  author       = personList(as.person("S{\\o}ren H{\\o}jsgaard"),
+  author       = c(as.person("S{\\o}ren H{\\o}jsgaard"),
                    as.person("Steffen Lauritzen")),
   journal      = "Journal of Statistical Software",
   year         = "2007",
@@ -19,9 +19,9 @@ citEntry(entry = "Article",
         "URL https://www.jstatsoft.org/v23/i06/")
 )
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
   title        = "Graphical {G}aussian models with edge and vertex symmetries",
-  author       = personList(as.person("S{\\o}ren H{\\o}jsgaard"),
+  author       = c(as.person("S{\\o}ren H{\\o}jsgaard"),
                    as.person("Steffen Lauritzen")),
   journal      = "Journal of the Royal Statistical Society, Series~B",
   year         = "2008",
@@ -29,8 +29,8 @@ citEntry(entry = "Article",
   number       = "5",
   pages        = "1005--1027",
   doi          = "10.1111/j.1467-9868.2008.00666.x",
-  url          = "https://rss.onlinelibrary.wiley.com/doi/10.1111/j.1467-9868.2008.00666.x",
-
+  ## url          = "https://rss.onlinelibrary.wiley.com/doi/10.1111/j.1467-9868.2008.00666.x",
+  url = "https://doi.org/10.1111/j.1467-9868.2008.00666.x",
   textVersion  =
   paste("Søren Højsgaard, Steffen Lauritzen (2008).",
         "Graphical Gaussian models with edge and vertex symmetries.",

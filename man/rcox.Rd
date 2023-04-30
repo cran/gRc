@@ -55,23 +55,26 @@ A model object of type 'RCOX'.
 }
 \description{
 This is the main function for specifying and fitting
-RCON/RCOR models in the package along with certain utility
-functions.
+  RCON/RCOR models in the package along with certain utility
+  functions.
 }
 \details{
 Estimation methods:
-\itemize{
-\item 'ipm' (default) is iterative partial maximization
-which when finished calculates the information matrix so that
-approximate variances of the parameters can be obtained using vcov().
-\item 'ipms' is iterative partial maximization without
-calculating the information matrix. This is the fastest method.
-\item 'scoring' is stabilised Fisher scoring.
-\item 'matching' is score matching followed by one step with Fisher
-scoring.
-\item 'hybrid1' is for
-internal use and should not be called directly
-}
+
+*   'ipm' (default) is iterative partial maximization
+   which when finished calculates the information matrix so that
+   approximate variances of the parameters can be obtained using vcov().
+
+*   'ipms' is iterative partial maximization without
+   calculating the information matrix. This is the fastest method.
+   
+*   'scoring' is stabilised Fisher scoring.
+   
+*   'matching' is score matching followed by one step with Fisher
+   scoring.  
+
+*   'hybrid1' is for
+   internal use and should not be called directly
 }
 \examples{
 data(math)

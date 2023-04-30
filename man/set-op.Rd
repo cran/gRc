@@ -10,7 +10,7 @@
 \title{Set operations}
 \description{
 These functions are not intended to be called by the
-user.
+  user.
 }
 \author{
 Søren Højsgaard, \email{sorenh@math.aau.dk}

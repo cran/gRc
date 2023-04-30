@@ -65,15 +65,15 @@ An RCOX model object.
 }
 \description{
 This is a general function for fitting RCOX models
-(i.e.\ RCON and RCOR models) using different estimation
-algorithms.
+  (i.e.\ RCON and RCOR models) using different estimation
+  algorithms.
 }
 \details{
 The fitted parameters etc. can be extracted using
-'fitInfo(m)'.  The control argument is a list with named
-entries. Most important are the entries 'maxouter' and 'maxinner'
-(which both defaults to 25) for controlling the estimation
-algorithms. For other components please  refer to the code.
+  'fitInfo(m)'.  The control argument is a list with named
+  entries. Most important are the entries 'maxouter' and 'maxinner'
+  (which both defaults to 25) for controlling the estimation
+  algorithms. For other components please  refer to the code.
 }
 \examples{
 

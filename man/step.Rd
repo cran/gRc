@@ -58,8 +58,8 @@ colour classes and by joining edge/vertex colour classes.
 }
 \note{
 Note that the keyword 'stat' is not available for stepadd1
-and stepsplit1 because these functions expand the current model
-and hence the Wald statistic is not available.
+  and stepsplit1 because these functions expand the current model
+  and hence the Wald statistic is not available.
 }
 \seealso{
 \code{\link{split1}} \code{\link{join1}} \code{\link{add1.rcox}}

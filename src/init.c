@@ -8,7 +8,7 @@
 */
 
 /* .Call calls */
-extern SEXP _gRc_RcppExport_registerCCallable();
+extern SEXP _gRc_RcppExport_registerCCallable(void);
 extern SEXP _gRc_trAWBV_(SEXP, SEXP, SEXP, SEXP);
 extern SEXP _gRc_trAWBW_(SEXP, SEXP, SEXP);
 extern SEXP _gRc_trAWBWlist_(SEXP, SEXP, SEXP, SEXP);

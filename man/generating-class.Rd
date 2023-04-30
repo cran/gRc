@@ -37,8 +37,8 @@
 \title{Generating class for RCON / RCOR models}
 \description{
 Implementation of generating classes for RCOX
-models. These functions are not intended to be called by the
-user.
+  models. These functions are not intended to be called by the
+  user.
 }
 \author{
 Søren Højsgaard, \email{sorenh@math.aau.dk}

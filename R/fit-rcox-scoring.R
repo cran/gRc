@@ -74,7 +74,7 @@ scoring <- function(object, K0,
 
     Sc      <- xxx$score
     DISC    <- try(solve.default(xxx$J + (Sc %*% t(Sc) / fscale), Sc))
-    if (class(DISC) == 'try-error'){
+    if (identical(class(DISC), 'try-error')){
       cat("Error in Fisher scoring, please report...\n")
     }
 
