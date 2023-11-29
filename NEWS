@@ -1,5 +1,16 @@
+Version 0.4.6 data: 2023-11-29
+------------------------------
+
+Changes:
+
+* A technical update to keep cran maintainers pleased.
+
+
+
 Version 0.4.4 data: 2021-03-30
 ------------------------------
+
+Changes:
 
 * All old c-code has been removed.
 

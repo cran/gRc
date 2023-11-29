@@ -6,7 +6,7 @@
 #' @description Coerce parameters in RCOX models. These functions
 #'   should not be called directly by the user.
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
-#' @name coerce-parm
+#' @name coerce_parm
 ######################################################################
 #'
 #' @param object Model object.
@@ -16,13 +16,13 @@
 #' 
 NULL
 
-#' @rdname coerce-parm
+#' @rdname coerce_parm
 #' @export
 theta2K <- function(object, theta, scale='original'){
   UseMethod("theta2K")
 }
 
-#' @rdname coerce-parm
+#' @rdname coerce_parm
 #' @export
 K2theta <- function(object, K, scale='original'){
   UseMethod("K2theta")
@@ -30,7 +30,7 @@ K2theta <- function(object, K, scale='original'){
 
 
 ## Matrices
-#' @rdname coerce-parm
+#' @rdname coerce_parm
 #' @export
 theta2K.rcon <- function(object, theta, scale='original'){
 
@@ -77,7 +77,7 @@ theta2K.rcon <- function(object, theta, scale='original'){
 }
 
 
-#' @rdname coerce-parm
+#' @rdname coerce_parm
 #' @export
 theta2K.rcor <- function(object, theta, scale='original'){
 
@@ -129,7 +129,7 @@ theta2K.rcor <- function(object, theta, scale='original'){
 
 
 
-#' @rdname coerce-parm
+#' @rdname coerce_parm
 #' @export
 K2theta.rcon <- function(object, K, scale='original'){
 
@@ -172,7 +172,7 @@ K2theta.rcon <- function(object, K, scale='original'){
 ## For off-diagonal elements K[i,j] the parameters are those values
 ## scaled with the diagonals
 
-#' @rdname coerce-parm
+#' @rdname coerce_parm
 #' @export
 K2theta.rcor <- function(object, K, scale='original'){
     

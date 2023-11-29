@@ -1,5 +1,5 @@
 Package: gRc
-Version: 0.4.5
+Version: 0.4.6
 Title: Inference in Graphical Gaussian Models with Edge and Vertex
         Symmetries
 Author: Søren Højsgaard <sorenh@math.aau.dk>, Steffen L. Lauritzen <lauritzen@math.ku.dk>
@@ -21,5 +21,5 @@ Repository: CRAN
 ByteCompile: Yes
 RoxygenNote: 7.2.3
 NeedsCompilation: yes
-Packaged: 2023-04-30 06:40:35 UTC; sorenh
-Date/Publication: 2023-04-30 07:00:02 UTC
+Packaged: 2023-11-29 13:32:19 UTC; sorenh
+Date/Publication: 2023-11-29 13:50:02 UTC

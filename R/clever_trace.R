@@ -2,7 +2,7 @@
 #' @title Calculate trace of various matrix products.
 #' @description Calculate trace of various matrix products.
 #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
-#' @name clever-trace
+#' @name clever_trace
 ######################################################################
 
 #' @param rA,rB Square matrices represented as "sparse" matrices. The
@@ -76,7 +76,7 @@
 #' sum(diag(A1.de %*% W %*% A2.de %*% V))
 #' 
 
-#' @rdname clever-trace
+#' @rdname clever_trace
 #' @export
 trA <- function(A){
   if (ncol(A)==1) return(nrow(A))
@@ -84,62 +84,62 @@ trA <- function(A){
 }
 
 
-#' @rdname clever-trace
+#' @rdname clever_trace
 #' @export
 trAW <- trAW_
 
-#' @rdname clever-trace
+#' @rdname clever_trace
 #' @export
 trAWB <- trAWB_
 
-#' @rdname clever-trace
+#' @rdname clever_trace
 #' @export
 trAWBW <- trAWBW_
 
-#' @rdname clever-trace
+#' @rdname clever_trace
 #' @export
 trAWBV <- trAWBV_
 
-#' @rdname clever-trace
+#' @rdname clever_trace
 #' @export
 trAWBlist <- trAWBlist_
 
-#' @rdname clever-trace
+#' @rdname clever_trace
 #' @export
 trAWBWlist <- trAWBWlist_
 
 
-## #' @rdname clever-trace
+## #' @rdname clever_trace
 ## #' @export
 ## trAW <- function(A, W){
 ##   .Call("trAW", A, W, PACKAGE="gRc")
 ## }
 
-## #' @rdname clever-trace
+## #' @rdname clever_trace
 ## #' @export
 ## trAWB <- function(A,W,B){
 ##   .Call("trAWB", A, W, B, PACKAGE="gRc")
 ## }
 
-## #' @rdname clever-trace
+## #' @rdname clever_trace
 ## #' @export
 ## trAWBW <- function(A,W,B){
 ##    .Call("trAWBW", A, W, B, PACKAGE="gRc")
 ## }
 
-## #' @rdname clever-trace
+## #' @rdname clever_trace
 ## #' @export
 ## trAWBV <- function(A,W,B,V){
 ##   .Call("trAWBV", A, W, B, V, PACKAGE="gRc")
 ## }
 
-## #' @rdname clever-trace
+## #' @rdname clever_trace
 ## #' @export
 ## trAWBlist <- function(Alist,W,Blist,mode){
 ##   .Call("trAWBlist", Alist, W, Blist,mode, PACKAGE="gRc")
 ## }
 
-## #' @rdname clever-trace
+## #' @rdname clever_trace
 ## #' @export
 ## trAWBWlist <- function(Alist,W,Blist,mode){
 ##   .Call("trAWBWlist", Alist, W, Blist, mode,PACKAGE="gRc")

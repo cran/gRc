@@ -26,8 +26,6 @@
 #' fitInfo(m1,"K")
 NULL
 
-
-
 #' @rdname get-slot
 #' @export
 getSlot<-function(object, slot){
