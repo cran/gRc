@@ -15,14 +15,9 @@
 #' 
 #' @importFrom utils combn str install.packages
 #'
-## #' @importMethodsFrom stats4 plot
-## #' @exportMethod plot
+#' @importMethodsFrom stats4 plot
+#' @exportMethod plot
 #' 
-## To make available in vignette 
-#' @importFrom magrittr   "%>%"
-## #' @export "%>%"
-#'
-## #' @importFrom BiocManager install
 
 ## Miscellaneous
 ## -------------
@@ -31,26 +26,10 @@
 #' @import methods
 #' @import gRbase
 #'
-# #' @importFrom igraph igraph.to.graphNEL igraph.from.graphNEL
-# #'     get.adjacency V "V<-" E "E<-" is.directed layout.lgl
-# #'     layout.graphopt plot.igraph graph.adjacency is.dag
+#' @importFrom igraph 
+#'     get.adjacency V "V<-" E "E<-" is.directed layout.lgl
+#'     layout.graphopt plot.igraph as_edgelist get.edge.ids
 
-
-## Bioconductor imports/exports
-## ----------------------------
-
-## #' @importClassesFrom graph graphNEL
-# #' @importFrom graph edges nodes edgeMatrix addEdge addNode removeEdge removeNode
-# #' @export edges nodes edgeMatrix addEdge addNode removeEdge removeNode
-
-## #' @importMethodsFrom Rgraphviz plot
-
-#' @importFrom methods as new setOldClass
-#'
-## #' @importMethodsFrom Matrix t isSymmetric diag
-## #' @importFrom Matrix Matrix
  
 NULL
-
-##.dumfunction_afterimportFrom <- function(){}
 

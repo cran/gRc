@@ -137,7 +137,7 @@ stepjoin1 <- function(object, scope, type='ecc', criterion='aic', steps=1000, k=
       KS <- fitInfo(object,"K")
 
       scopecc[names(cc)] <- NULL;      
-      scopecc <- .addccnames(.joincc(list(unlist(cc,recursive=FALSE)), scopecc), type)
+      scopecc <- .addccnames(join_cc(list(unlist(cc,recursive=FALSE)), scopecc), type)
       #print("Iteration - scopecc (after)"); print(scopecc)
 
       newcc <- .addccnames(unionL2L2(untouch, scopecc),type)
@@ -658,7 +658,7 @@ stepjoin1 <- function(object, scope, type='ecc', criterion='aic', steps=1000, k=
       scopecc[names(cc)] <- NULL;      
 
       if (length(scopecc)){ ## There are still cc's left
-        scopecc <- .addccnames(.joincc(list(unlist(cc,recursive=FALSE)), scopecc), type)
+        scopecc <- .addccnames(join_cc(list(unlist(cc,recursive=FALSE)), scopecc), type)
       } else {
         scopecc <- .addccnames(list(unlist(cc, recursive=FALSE)),type)
       }

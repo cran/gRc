@@ -1,31 +1,34 @@
-######################################################################
-#' @title Set operations
-#' @description These functions are not intended to be called by the
-#'   user.
-#' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
-#' @name set-op
-######################################################################
-#'
-#' @aliases cardOrder listOrder listOrder.list listOrder.numeric
-#'   listOrder.default
-#' 
-NULL
+## ######################################################################
+## #' @title Set operations
+## #' @description These functions are not intended to be called by the
+## #'   user.
+## #' @author Søren Højsgaard, \email{sorenh@@math.aau.dk}
+## #' @name set-op
+## ######################################################################
+## #'
+## #' @aliases cardOrder listOrder listOrder.list listOrder.numeric
+## #'   listOrder.default
+## #' 
+## NULL
 
-cardOrder <- function(xlist){
-  x <- xlist
-  len <- unlist(lapply(x,length))
-  unlen <- sort(unique(len))
-  x2 <- NULL
-  for (i in seq(along=unlen)){
-    x2  <- c(x2, x[len==unlen[i]])
-  }
-  x2
-}
+## cardOrder <- function(xlist){
+##   x <- xlist
+##   len <- unlist(lapply(x,length))
+##   unlen <- sort(unique(len))
+##   x2 <- NULL
+##   for (i in seq(along=unlen)){
+##     x2  <- c(x2, x[len==unlen[i]])
+##   }
+##   x2
+## }
+
 
 ## Sorting lists
 ##
+
 listOrder         <- function(x) UseMethod('listOrder')
 
+#' @export
 listOrder.numeric <- function(x){ #print("numeric"); print(x); 
   cl <- class(x)
   x <- x[order(x)] 
@@ -33,6 +36,7 @@ listOrder.numeric <- function(x){ #print("numeric"); print(x);
   x
 }
 
+#' @export
 listOrder.list    <- function(x){ #print("list   "); print(x); 
   cl <- class(x)
   
@@ -57,8 +61,13 @@ listOrder.list    <- function(x){ #print("list   "); print(x);
   x
 }
 
-listOrder.default <- function(x){ #print("default"); print(x); 
-  x 
-}
+## listOrder.default <- function(x){ #print("default"); print(x); 
+##   x 
+## }
 
+
+#' @export
+listOrder.cc    <- listOrder.list
+
+## listOrder.atom  <- listOrder.numeric
 

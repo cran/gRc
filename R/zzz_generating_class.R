@@ -7,27 +7,27 @@
 #' @name generating-class
 ######################################################################
 #'
-#' @aliases as.V is.V as.L is.L as.L2 is.L2 matchVL matchLL2 matchVL2
-#'   unionLL unionL2L2 setequalLL setdiffLL addVL2 is.elementVL
-#'   is.subsetLL match.containsLL2
-#'   toLisp toLisp.default toLisp.list toLisp.cc
-#'   listOrder.cc listOrder.atom as.atom as.cc as.cc.list
-#'   as.cc.default as.cclist print.cc print.cclist print.atom
-#'   maximalSetL2
+## ' @aliases as.V is.V as.L is.L as.L2 is.L2 matchVL matchLL2 matchVL2
+## '   unionLL unionL2L2 setequalLL setdiffLL addVL2 is.elementVL
+## '   is.subsetLL match.containsLL2
+## '   toLisp toLisp.default toLisp.list toLisp.cc
+## '   
+## '   as.cc.default as.cclist print.cc print.cclist print.atom
+## '   maximalSetL2
 NULL
 
-as.V <- function(x){
-  as.atom(x)
-}
+## as.V <- function(x){
+##   as.atom(x)
+## }
 
 is.V <- function(x){
   is.numeric(x) | is.character(x) 
 }
 
-as.L <- function(x){
-    if (!is.L(x)) stop("Can not create L\n")
-    as.cc(x)
-}
+## as.L <- function(x){
+##     if (!is.L(x)) stop("Can not create L\n")
+##     as.cc(x)
+## }
 
 is.L <- function(x){
   is.list(x) && all(sapply(x, is.V)) 
@@ -58,23 +58,23 @@ matchLL2 <- function(x,y){
   z 
 }
 
-matchVL2 <- function(x,y){
-  z <- which(sapply(y, function(d) {
-    u <- matchVL(x,d)
-    any(!is.na(u))
-  }))
-  if (length(z)==0)
-    z <- NA
-  z 
-}
+## matchVL2 <- function(x,y){
+##   z <- which(sapply(y, function(d) {
+##     u <- matchVL(x,d)
+##     any(!is.na(u))
+##   }))
+##   if (length(z)==0)
+##     z <- NA
+##   z 
+## }
 
 
 ## Union
 ##
 
-unionLL <- function(x,y){
-  as.cc(unique(listOrder(c(x, y))))
-}
+## unionLL <- function(x,y){
+##   as.cc(unique(listOrder(c(x, y))))
+## }
 
 unionL2L2 <- function(x,y){
   if (length(y)==0)
@@ -82,8 +82,6 @@ unionL2L2 <- function(x,y){
   v<-unique(listOrder(c(x,y)))
   as.L2(v)
 }
-
-
 
 ## Miscellaneous
 setequalLL <- function(x,y){
@@ -116,15 +114,15 @@ setdiffLL <- function(x,y){
   x[-idx]
 }
 
-addVL2 <- function(x,y){
-  if (length(y)){
-    z <- matchVL2(x,y)
-    ##print(z)
-    if (!is.na(z))
-      return(NA)
-  }
-  unionL2L2( as.L2(list(as.cc(x))), y)
-}
+## addVL2 <- function(x,y){
+##   if (length(y)){
+##     z <- matchVL2(x,y)
+##     ##print(z)
+##     if (!is.na(z))
+##       return(NA)
+##   }
+##   unionL2L2( as.L2(list(as.cc(x))), y)
+## }
 
 
 is.elementVL <- function(x,y)
@@ -143,8 +141,8 @@ match.containsLL2 <- function(x,y){
 
 
 
-## For printing in lisp style ((..)(..))...
-##
+#' @title For printing in lisp style
+#' @param v Object to be printed
 
 #' @export
 toLisp <- function(v) {
@@ -168,19 +166,19 @@ toLisp.default <- function(v){
 
 
 
-listOrder.cc    <- listOrder.list
-listOrder.atom  <- listOrder.numeric
+## as.atom <- function(...){
+##   x <- unlist(list(...))
+##   if (length(x)==1)
+##     class(x) <- c('v', 'atom', class(x))
+##   else
+##     class(x) <- c('e', 'atom', class(x))
+##   x
+## }
 
-as.atom <- function(...){
-  x <- unlist(list(...))
-  if (length(x)==1)
-    class(x) <- c('v', 'atom', class(x))
-  else
-    class(x) <- c('e', 'atom', class(x))
-  x
-}
+as.cc <- function(v)
+    UseMethod("as.cc")
 
-as.cc <- function(v) UseMethod("as.cc")
+#' @export
 as.cc.list <- function(v){
   u <- unique(sapply(v,length))
   if (length(u)>1)
@@ -197,6 +195,7 @@ as.cc.list <- function(v){
 }
 
 
+#' @export
 as.cc.default <- function(v){
   as.cc(list(v))
 }
@@ -207,41 +206,43 @@ as.cclist <- function(x){
   x
 }
 
-
+#' @export
 print.cc <- function(x, ...){
   cat(class(x)[1], toLisp(x),"\n")
 }
 
+#' @export
 print.cclist <- function(x,...){
   lapply(x, print)
 }
 
+#' @export
 print.atom <- function(x, ...){
   ##cat(paste("(",paste(x,collapse=','),")",sep=''),"\n")
   cat(toLisp(x),"\n")
 }
 
-maximalSetL2 <- function(set){
-  if (length(set)<=1)
-    return(set)
+## maximalSetL2 <- function(set){
+##   if (length(set)<=1)
+##     return(set)
 
-  set   <- unique(cardOrder(set))
-  wset  <- set
-  value <- NULL
-  repeat{
-    el    <- wset[[1]]
-    wset2 <- wset[-1]
-    idx <- match.containsLL2(el, wset2)
-    if (is.na(idx))
-      value <- c(value, list(el))
-    wset <- wset2
+##   set   <- unique(cardOrder(set))
+##   wset  <- set
+##   value <- NULL
+##   repeat{
+##     el    <- wset[[1]]
+##     wset2 <- wset[-1]
+##     idx <- match.containsLL2(el, wset2)
+##     if (is.na(idx))
+##       value <- c(value, list(el))
+##     wset <- wset2
     
-    if(length(wset)==0) 
-      break()
-    if(length(wset)==1){
-      value <- c(value,wset)
-      break()
-    }
-  }
-  return(value)
-}
+##     if(length(wset)==0) 
+##       break()
+##     if(length(wset)==1){
+##       value <- c(value,wset)
+##       break()
+##     }
+##   }
+##   return(value)
+## }

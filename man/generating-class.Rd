@@ -2,38 +2,6 @@
 % Please edit documentation in R/zzz_generating_class.R
 \name{generating-class}
 \alias{generating-class}
-\alias{as.V}
-\alias{is.V}
-\alias{as.L}
-\alias{is.L}
-\alias{as.L2}
-\alias{is.L2}
-\alias{matchVL}
-\alias{matchLL2}
-\alias{matchVL2}
-\alias{unionLL}
-\alias{unionL2L2}
-\alias{setequalLL}
-\alias{setdiffLL}
-\alias{addVL2}
-\alias{is.elementVL}
-\alias{is.subsetLL}
-\alias{match.containsLL2}
-\alias{toLisp}
-\alias{toLisp.default}
-\alias{toLisp.list}
-\alias{toLisp.cc}
-\alias{listOrder.cc}
-\alias{listOrder.atom}
-\alias{as.atom}
-\alias{as.cc}
-\alias{as.cc.list}
-\alias{as.cc.default}
-\alias{as.cclist}
-\alias{print.cc}
-\alias{print.cclist}
-\alias{print.atom}
-\alias{maximalSetL2}
 \title{Generating class for RCON / RCOR models}
 \description{
 Implementation of generating classes for RCOX

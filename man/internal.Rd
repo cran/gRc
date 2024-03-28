@@ -22,7 +22,6 @@
 %%% code: All over the place
 \alias{print.colourClass}
 \alias{print.rcox}
-\alias{plot.rcox}
 \alias{print.statTable}
 %\alias{}
 

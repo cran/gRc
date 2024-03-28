@@ -90,7 +90,7 @@ update.rcox <- function(object,
   if (!is.null(joinvcc)){
     oldcc   <- getSlot(object,"vcc")
     joinvcc   <- .ccl2names(joinvcc, oldcc)
-    new.ccl   <- .joincc(joinvcc, oldcc)
+    new.ccl   <- join_cc(joinvcc, oldcc)
     new.ccl   <- .addccnames(new.ccl, type="vcc")
     vcc       <- new.ccl
     if (trace>=1)cat(".joining vcc:", toLisp(joinvcc),"\n")
@@ -99,7 +99,7 @@ update.rcox <- function(object,
   if (!is.null(joinecc)){
     oldcc   <- getSlot(object,"ecc")
     joinecc   <- .ccl2names(joinecc, oldcc)
-    new.ccl   <- .joincc(joinecc, oldcc)
+    new.ccl   <- join_cc(joinecc, oldcc)
     new.ccl   <- .addccnames(new.ccl, type="ecc")
     ecc       <- new.ccl
     if (trace>=1)cat(".joining ecc:", toLisp(joinecc),"\n")
@@ -108,7 +108,7 @@ update.rcox <- function(object,
   if (!is.null(splitvcc)){
     oldcc    <- getSlot(object,"vcc")
     splitvcc   <- .ccl2names(splitvcc, oldcc)
-    new.ccl    <- .splitcc(splitvcc, oldcc)
+    new.ccl    <- split_cc(splitvcc, oldcc)
     new.ccl    <- .addccnames(new.ccl, type="vcc")
     vcc        <- new.ccl
     if (trace>=1)cat(".splitting vcc:", toLisp(splitvcc),"\n")
@@ -119,7 +119,7 @@ update.rcox <- function(object,
     oldccV  <- object$intRep$eccV
     splitecc   <- .ccl2names(splitecc, oldcc)    
     
-    new.ccl    <- .splitcc(splitecc, oldcc)
+    new.ccl    <- split_cc(splitecc, oldcc)
     new.ccl    <- .addccnames(new.ccl, type="ecc")
     ecc        <- new.ccl
     if (trace>=1)cat(".splitting ecc:", toLisp(splitecc),"\n")
@@ -198,7 +198,7 @@ update.rcox <- function(object,
 }
 
 
-.splitcc <- function(cc, old.ccl){
+split_cc <- function(cc, old.ccl){
   idx       <- sapply(cc, matchLL2, old.ccl)
   if ((length(idx)>1) || (!is.na(idx))){
     old.ccl <- old.ccl[-idx]
@@ -208,7 +208,7 @@ update.rcox <- function(object,
   new.ccl
 }
 
-.joincc <- function(cc, old.ccl){
+join_cc <- function(cc, old.ccl){
   idx       <- sapply(cc, matchLL2, old.ccl)
   if ((length(idx)>1) || (!is.na(idx))){
     old.ccl <- old.ccl[-idx]

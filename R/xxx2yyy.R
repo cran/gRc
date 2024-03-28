@@ -34,14 +34,17 @@ getIndex           <- function(x, vn){
   UseMethod('getIndex')
 }
 
+#' @export
 getIndex.default   <- function(x, vn){
   x
 }
 
+#' @export
 getIndex.list      <- function(x, vn){
   lapply(x, function(a) getIndex(a, vn))
 }
 
+#' @export
 getIndex.character <- function(x, vn){
   match(x,vn)
 }
@@ -101,8 +104,10 @@ names2indices <- function(x,vn,matrix=TRUE){
 ##
 names2formula           <- function(x) 
   UseMethod("names2formula")
+#' @export
 names2formula.list      <- function(x) 
   lapply(x, names2formula.default)
+#' @export
 names2formula.default <- function(x){
   if (is.null(x))
     return(NULL)
@@ -134,8 +139,8 @@ ecc2edges <- function(x){
 }
 
 
-## Fragile........
-cc2formula <- function(cc){
-  v<-as.formula(paste("~", paste(unlist(lapply(lapply(cc, unlist), paste, collapse=":")),collapse="+")))
-  v
-}
+## ## Fragile........
+## cc2formula <- function(cc){
+##   v<-as.formula(paste("~", paste(unlist(lapply(lapply(cc, unlist), paste, collapse=":")),collapse="+")))
+##   v
+## }

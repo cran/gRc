@@ -114,6 +114,7 @@ getedges <- function(object,complement=FALSE){
   ans
 }
 
+#' @export
 print.colourClass <- function(x,...){
   xf <- names2formula(x)
   xs <- formula2string(xf)
@@ -127,18 +128,18 @@ coef.rcox <- function(object, ...){
   co
 }
 
-tocc <- function(v){
-  if(length(v)==0)
-    return(NULL)
-  as.cclist(
-  lapply(v, function(x) {
-    if (length(x)==1)
-      as.cc(as.atom(x))
-    else
-      as.cc(lapply(x, as.atom))
-    })
-  )
-}
+## tocc <- function(v){
+##   if(length(v)==0)
+##     return(NULL)
+##   as.cclist(
+##   lapply(v, function(x) {
+##     if (length(x)==1)
+##       as.cc(as.atom(x))
+##     else
+##       as.cc(lapply(x, as.atom))
+##     })
+##   )
+## }
 
 
 cc2str <- function(cc){

@@ -9,6 +9,7 @@ findKinModel <- function(object, KS, type="rcon", regularize=TRUE)
 
 
 ## MATRIX VERSION
+#' @export
 findKinModel.rcox <- function(object, KS, type="rcon", regularize=TRUE){
   if (is.null(KS))
     return(NULL)
