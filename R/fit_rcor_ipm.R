@@ -218,7 +218,7 @@ refitA_old <- function(S, K, NSi, Astart=NULL, itmax=100){
 
 ##   for (i in 1:length(vccI)){
 ##     gset[[i]] <- as.numeric(vccI[[i]])
-##     cset[[i]] <- setdiffPrim(all, gset[[i]])
+##     cset[[i]] <- setdiff(all, gset[[i]])
 ##   }
 
 ##   repeat{

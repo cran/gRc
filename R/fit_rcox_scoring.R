@@ -127,7 +127,7 @@ scoring <- function(object, K0,
   if (trace>=3) cat("...Scoring iterations:", itcount, "\n")
   logL.vec <- logL.vec[!is.na(logL.vec)]
 
-  vn <- unlistPrim(lapply(getcc(object),names))
+  vn <- unlist(lapply(getcc(object),names))
   names(new.theta) <- vn
 
   ## Back to original scale

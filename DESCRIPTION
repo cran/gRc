@@ -1,8 +1,13 @@
 Package: gRc
-Version: 0.5.0
+Version: 0.5.1
 Title: Inference in Graphical Gaussian Models with Edge and Vertex
         Symmetries
-Author: Søren Højsgaard <sorenh@math.aau.dk>, Steffen L. Lauritzen <lauritzen@math.ku.dk>
+Authors@R: c(
+    person(given = "Steffen", family = "Lauritzen",
+        email = "lauritzen@math.ku.dk", role = c("aut", "cph")),
+    person(given = "Søren", family = "Højsgaard",
+        email = "sorenh@math.aau.dk", role = c("aut", "cre", "cph"))
+  )
 Maintainer: Søren Højsgaard <sorenh@math.aau.dk>
 Description: Estimation, model selection and other aspects of
     statistical inference in Graphical Gaussian models with edge and
@@ -19,7 +24,9 @@ LinkingTo: Rcpp (>= 0.11.1), RcppArmadillo
 URL: https://people.math.aau.dk/~sorenh/software/gR/
 Repository: CRAN
 ByteCompile: Yes
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 NeedsCompilation: yes
-Packaged: 2024-03-27 10:04:49 UTC; sorenh
-Date/Publication: 2024-03-28 08:40:19 UTC
+Packaged: 2024-10-15 06:50:11 UTC; sorenh
+Date/Publication: 2024-10-15 07:40:03 UTC
+Author: Steffen Lauritzen [aut, cph],
+  Søren Højsgaard [aut, cre, cph]

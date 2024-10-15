@@ -241,17 +241,17 @@ print.rcox <- function(x, ...){
   
   ## Get vertices/edges from gm-spec
   ##
-  idx         <- unlistPrim(lapply(gmN, length))
-  gmNvertices <- lapply(uniquePrim(unlistPrim(gmN)),list) ## lapply(gmN[idx==1], list)
+  idx         <- unlist(lapply(gmN, length))
+  gmNvertices <- lapply(unique(unlist(gmN)),list) ## lapply(gmN[idx==1], list)
   x           <- unlist(lapply(gmN[idx>1], names2pairs),recursive=FALSE)
   gmNedges    <- lapply(x, list)
 
   ## Make standard representation
   ##
   eccN <- c(eccN, gmNedges)
-  uuu  <- unlistPrim(eccN)  
+  uuu  <- unlist(eccN)  
   uuu  <- lapply(uuu, as.list)
-  vccN <- uniquePrim(c(uuu, vccN, gmNvertices))
+  vccN <- unique(c(uuu, vccN, gmNvertices))
 
   vccI <- names2indices(vccN, dataNames, matrix=FALSE)
   eccI <- names2indices(eccN, dataNames, matrix=FALSE)
@@ -260,7 +260,7 @@ print.rcox <- function(x, ...){
   #ri   <- .redundant.index(vccI)
 
   xxxx2 <- lapply(vccI, function(x3)
-                   {z<-do.call("rbind",x3); z[,1]<-z[,1]*10000; rowSumsPrim(z)})
+                   {z<-do.call("rbind",x3); z[,1]<-z[,1]*10000; rowSums(z)})
   ri <- which(remove_redundant(xxxx2, index=TRUE)>0)
 
   vccN <- vccN[ri]
@@ -268,13 +268,13 @@ print.rcox <- function(x, ...){
   #ri   <- .redundant.index(eccI)
   if (length(eccI)){
     xxxx2 <- lapply(eccI, function(x3)
-                    {z<-do.call("rbind",x3); z[,1]<-z[,1]*10000; rowSumsPrim(z)})
+                    {z<-do.call("rbind",x3); z[,1]<-z[,1]*10000; rowSums(z)})
     ri <- which(remove_redundant(xxxx2, index=TRUE)>0)
     eccN <- eccN[ri]
   }
   
   
-  varNames <- uniquePrim(unlistPrim(c(vccN,eccN)))
+  varNames <- unique(unlist(c(vccN,eccN)))
 
   ans <- list(vccN=vccN, eccN=eccN, varNames=varNames)
   return(ans)

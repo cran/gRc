@@ -1,5 +1,5 @@
 0dac4b13bfe65218e0bf22c963d8ca16 *ChangeLog
-39cd819631567ed064a6808517a90809 *DESCRIPTION
+602d97f4b39e17f722dd8f740fdcb90a *DESCRIPTION
 6f8dc1bd3f6da426651e051a508d6992 *NAMESPACE
 3ed225830f8f853aa020c4de20775f99 *NEWS
 376bdf980d356ad224ab3242d7111f98 *R/NAMESPACE.R
@@ -7,14 +7,14 @@
 66b687e633565b019f302cebd9d509fc *R/clever_trace.R
 6525a0e9a24d7308da4ee006f3e0de59 *R/coerce_parm.R
 cdd596d9ae63e9f509e18cf8001879c8 *R/display.R
-e0e0f74f426dad49488f55d815178c7b *R/fit_doc.R
+7114e193658296b11839a9bff14f7b24 *R/fit_doc.R
 cf38311b3a3532ae681aacbed9e95e4d *R/fit_main.R
-1287d262593a0d8fc7a192df5300ed25 *R/fit_rcon_ipm.R
-d7ec744cd6876bb3861dda51d85a813b *R/fit_rcor_ipm.R
+db73c84534c89cf50b219e29d932ae66 *R/fit_rcon_ipm.R
+dbe11549e5a4c20d1c00e6eee8bb3db5 *R/fit_rcor_ipm.R
 f2116381e147093c4c70bca9df3fcd0f *R/fit_rcox_matching.R
-ec0cd1f52ff8d7a7c6068a684c78968e *R/fit_rcox_scoring.R
+8b2d00e85f31ab697bf942eb6561c3ca *R/fit_rcox_scoring.R
 f2d1db5e8b081af793ddbf2a1ba9757e *R/grc_summary_doc.R
-858fd666b974b05dbbe5e554f97b5e3b *R/rcox.R
+ace66106030df69c378d6b2618bbf49a *R/rcox.R
 1c48212b4acf193b6e95186b0781fa88 *R/repair_K.R
 9d8b56bebb69c34dc06c64a00a5af402 *R/score_information4.R
 2fc2c26b5dedec62a98239957dbb78e0 *R/set_op.R
@@ -23,7 +23,7 @@ f2d1db5e8b081af793ddbf2a1ba9757e *R/grc_summary_doc.R
 83b94ab7a71d3aa4b4d671c22e5f9998 *R/testing_misc.R
 1b91ade396f8580c14ef5edba1ada06d *R/testing_split1join1.R
 6333973baae5a8e6c6d7de02883aaeb8 *R/testing_stepwise.R
-687e2c2e63ad19300977b6d243592f13 *R/update.R
+c15704ead3a73c9e57da535326c9bf99 *R/update.R
 98adcc30f3c265da6a6425a27f6339a2 *R/utility4.R
 3af7cb307fba77760bb75ab168303b56 *R/vcov.R
 edc2a64889f1e2e95f8b6ed01826d937 *R/xxx2yyy.R
@@ -37,7 +37,7 @@ f9e6d18b20e69131ff0af915665d6e89 *man/add1-drop1.Rd
 f86286278243bf8970e02ad1b65de191 *man/clever_trace.Rd
 7af01ce26aed8785b58f7b757d5b7a5d *man/coerce_parm.Rd
 38a6eddf92e5b3568980ce5fabc5ca5b *man/comparecc.Rd
-1270b68a0287aff969b79c3ca4a22108 *man/fit-doc.Rd
+5da932d1828d933186da025cb037ef27 *man/fit-doc.Rd
 18070a0a8f7876a765e8d94d9fcab5b3 *man/fit-main.Rd
 86802370931e35a2d5f56418f0e4f7df *man/generating-class.Rd
 cea3cfc3e05e0215fd8a64055fb25056 *man/get-slot.Rd

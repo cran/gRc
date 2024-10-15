@@ -107,8 +107,8 @@ fitNR2 <- function(x, K, S, n, varIndex=1:nrow(K), type="ecc", control, trace){
       else
         genmat <- rbind(gen,gen[,2:1])
       
-      idx   <- sort(uniquePrim(as.numeric(gen)))
-      cidx  <- setdiffPrim(varIndex, idx);       
+      idx   <- sort(unique(as.numeric(gen)))
+      cidx  <- setdiff(varIndex, idx);       
       
       ## gen2: Version of gen which matches the lower dimensional matrices used later
       gen2           <- apply(gen, 2, match, idx)
@@ -293,8 +293,8 @@ fitNR2 <- function(x, K, S, n, varIndex=1:nrow(K), type="ecc", control, trace){
 ##       else
 ##         clmat <- rbind(cl, cl[, 2:1])
 
-##       idx   <- sort(uniquePrim(as.numeric(cl)))
-##       cidx  <- setdiffPrim(varIndex,idx);       
+##       idx   <- sort(unique(as.numeric(cl)))
+##       cidx  <- setdiff(varIndex,idx);       
       
 ##       ## cl2: Version of cl which matches the lower dimensional matrices used later
 ##       cl2 <- apply(cl, 2, match, idx)

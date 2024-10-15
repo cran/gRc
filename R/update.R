@@ -155,11 +155,11 @@ update.rcox <- function(object,
     #print(oldccV)
     
                                         #    idx       <- sapply(dropecc, matchLL2, oldcc)
-    idx <- unlistPrim(lapply(dropecc, matchLL2, oldcc))
+    idx <- unlist(lapply(dropecc, matchLL2, oldcc))
     idx       <- which(!is.na(idx))
     dropecc   <- dropecc[idx]    
     #idx       <- sapply(dropecc, matchLL2, oldcc)
-    idx       <- unlistPrim(lapply(dropecc, matchLL2, oldcc))
+    idx       <- unlist(lapply(dropecc, matchLL2, oldcc))
     
     new.ccl   <- oldcc[-idx]    
     ecc       <- new.ccl

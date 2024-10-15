@@ -58,7 +58,7 @@ ipm(m1, K0=f1$K)
 
 }
 \seealso{
-\code{\link{fit}}, \code{\link{rcox}}
+\code{\link[gRbase]{fit}}, \code{\link{rcox}}
 }
 \author{
 Søren Højsgaard, \email{sorenh@math.aau.dk}

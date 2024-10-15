@@ -21,7 +21,7 @@
 ##' not intended for the user.
 ##'
 ##' @return A list with fitted values (K, logL etc).
-##' @seealso \code{\link{fit}}, \code{\link{rcox}}
+##' @seealso \code{\link[gRbase]{fit}}, \code{\link{rcox}}
 ##' @keywords internal
 ##' @examples
 ##' 
